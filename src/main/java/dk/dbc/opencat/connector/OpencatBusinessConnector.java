@@ -28,8 +28,6 @@ public class OpencatBusinessConnector {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpencatBusinessConnector.class);
-    private static final String PATH_OPENCATBUSINESS_SERVICE = "/api/v1";
-
     private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
             .retryOn(Collections.singletonList(ProcessingException.class))
             .retryIf((Response response) -> response.getStatus() == 404)
@@ -108,8 +106,8 @@ public class OpencatBusinessConnector {
     public MessageEntryDTO[] validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final InputStream responseStream = sendPostRequest(PATH_OPENCATBUSINESS_SERVICE + "/validateRecord",
-                    Arrays.asList(schemaName, jsonbContext.marshall(marcRecord), "__settings"), InputStream.class);
+            final InputStream responseStream = sendPostRequest("/api/v1/validateRecord",
+                    Arrays.asList(schemaName, jsonbContext.marshall(marcRecord)), InputStream.class);
             return jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class);
         } finally {
             logger.log("validateRecord took {} milliseconds",
