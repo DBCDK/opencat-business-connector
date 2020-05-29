@@ -36,6 +36,7 @@ public class OpencatBusinessConnector {
 
     private final FailSafeHttpClient failSafeHttpClient;
     private final String baseUrl;
+    private static final String PATH_OPENCATBUSINESS_SERVICE_VALIDATE_RECORD = "/api/v1/validateRecord";
     private final OpencatBusinessConnector.LogLevelMethod logger;
 
     /**
@@ -106,7 +107,7 @@ public class OpencatBusinessConnector {
     public MessageEntryDTO[] validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final InputStream responseStream = sendPostRequest("/api/v1/validateRecord",
+            final InputStream responseStream = sendPostRequest(PATH_OPENCATBUSINESS_SERVICE_VALIDATE_RECORD,
                     Arrays.asList(schemaName, jsonbContext.marshall(marcRecord)), InputStream.class);
             return jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class);
         } finally {
