@@ -1,0 +1,22 @@
+{
+  "id" : "e395390e-f7cb-37db-acce-6482630ff2ef",
+  "request" : {
+    "url" : "/api/v1/checkTemplate",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"name\":\"netlydbog\",\"groupId\":\"710100\",\"libraryType\":\"fbs\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-checkTemplate-N126n.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "e395390e-f7cb-37db-acce-6482630ff2ef"
+}

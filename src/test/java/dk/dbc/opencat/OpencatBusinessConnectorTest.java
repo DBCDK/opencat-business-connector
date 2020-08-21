@@ -62,4 +62,18 @@ public class OpencatBusinessConnectorTest {
         MessageEntryDTO[] actualRespons = connector.validateRecord("dbcautoritet", marcRecord);
         assertThat("OpencatBusiness returns list with one validation error", actualRespons, is(expectedResponse));
     }
+
+    @Test
+    void checkTemplateTestFBSTrue() throws Exception {
+        boolean actual = connector.checkTemplate("netlydbog", "710100", "fbs");
+
+        assertThat("checkTemplate returns true", actual, is(true));
+    }
+
+    @Test
+    void checkTemplateTestFBSFalse() throws Exception {
+        boolean actual = connector.checkTemplate("dbc", "710100", "fbs");
+
+        assertThat("checkTemplate returns false", actual, is(false));
+    }
 }
