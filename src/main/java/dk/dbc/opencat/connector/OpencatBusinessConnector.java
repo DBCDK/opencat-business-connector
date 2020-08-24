@@ -1,28 +1,31 @@
 package dk.dbc.opencat.connector;
 
+import dk.dbc.common.records.MarcRecord;
+import dk.dbc.dataio.commons.utils.lang.StringUtil;
 import dk.dbc.httpclient.FailSafeHttpClient;
 import dk.dbc.httpclient.HttpPost;
 import dk.dbc.httpclient.PathBuilder;
 import dk.dbc.invariant.InvariantUtil;
+import dk.dbc.jsonb.JSONBContext;
+import dk.dbc.jsonb.JSONBException;
+import dk.dbc.opencatbusiness.dto.CheckTemplateRequestDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
-import dk.dbc.common.records.MarcRecord;
+import dk.dbc.util.Stopwatch;
+import net.jodah.failsafe.RetryPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-import dk.dbc.jsonb.JSONBContext;
-import dk.dbc.jsonb.JSONBException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import net.jodah.failsafe.RetryPolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import javax.ws.rs.core.Response;
-import dk.dbc.util.Stopwatch;
-import dk.dbc.dataio.commons.utils.lang.StringUtil;
 
 public class OpencatBusinessConnector {
     JSONBContext jsonbContext = new JSONBContext();
+
     public enum TimingLogLevel {
         TRACE, DEBUG, INFO, WARN, ERROR
     }
@@ -37,6 +40,7 @@ public class OpencatBusinessConnector {
     private final FailSafeHttpClient failSafeHttpClient;
     private final String baseUrl;
     private static final String PATH_OPENCATBUSINESS_SERVICE_VALIDATE_RECORD = "/api/v1/validateRecord";
+    private final static String PATH_OPENCAT_BUSINESS_SERVICE_CHECK_TEMPLATE_URL = "/api/v1/checkTemplate";
     private final OpencatBusinessConnector.LogLevelMethod logger;
 
     /**
@@ -114,6 +118,24 @@ public class OpencatBusinessConnector {
             logger.log("validateRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
         }
+    }
+
+    public boolean checkTemplate(String name,
+                                 String groupId,
+                                 String libraryType) throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final CheckTemplateRequestDTO requestDTO = new CheckTemplateRequestDTO();
+            requestDTO.setName(name);
+            requestDTO.setGroupId(groupId);
+            requestDTO.setLibraryType(libraryType);
+
+            return sendPostRequest(PATH_OPENCAT_BUSINESS_SERVICE_CHECK_TEMPLATE_URL, requestDTO, Boolean.class);
+        } finally {
+            logger.log("checkTemplate took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+
     }
 
     private <T> T sendPostRequest(String basePath, Object request, Class<T> type)
