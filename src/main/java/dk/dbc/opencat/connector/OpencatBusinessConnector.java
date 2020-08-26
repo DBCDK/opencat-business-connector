@@ -1,5 +1,6 @@
 package dk.dbc.opencat.connector;
 
+import dk.dbc.common.records.MarcField;
 import dk.dbc.common.records.MarcRecord;
 import dk.dbc.dataio.commons.utils.lang.StringUtil;
 import dk.dbc.httpclient.FailSafeHttpClient;
@@ -8,8 +9,17 @@ import dk.dbc.httpclient.PathBuilder;
 import dk.dbc.invariant.InvariantUtil;
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
+import dk.dbc.opencatbusiness.dto.BuildRecordRequestDTO;
+import dk.dbc.opencatbusiness.dto.CheckDoubleRecordFrontendRequestDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateRequestDTO;
+import dk.dbc.opencatbusiness.dto.DoRecategorizationThingsRequestDTO;
+import dk.dbc.opencatbusiness.dto.GetValidateSchemasRequestDTO;
+import dk.dbc.opencatbusiness.dto.RecategorizationNoteFieldFactoryRequestDTO;
+import dk.dbc.opencatbusiness.dto.RecordResponseDTO;
+import dk.dbc.opencatbusiness.dto.SortRecordRequestDTO;
+import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
+import dk.dbc.updateservice.dto.SchemaDTO;
 import dk.dbc.util.Stopwatch;
 import net.jodah.failsafe.RetryPolicy;
 import org.slf4j.Logger;
@@ -21,6 +31,7 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class OpencatBusinessConnector {
@@ -39,8 +50,15 @@ public class OpencatBusinessConnector {
 
     private final FailSafeHttpClient failSafeHttpClient;
     private final String baseUrl;
-    private static final String PATH_OPENCATBUSINESS_SERVICE_VALIDATE_RECORD = "/api/v1/validateRecord";
-    private final static String PATH_OPENCAT_BUSINESS_SERVICE_CHECK_TEMPLATE_URL = "/api/v1/checkTemplate";
+    private static final String PATH_VALIDATE_RECORD = "/api/v1/validateRecord";
+    private final static String PATH_CHECK_TEMPLATE = "/api/v1/checkTemplate";
+    private final static String PATH_CHECK_TEMPLATE_BUILD = "/api/v1/checkTemplateBuild";
+    private final static String PATH_CHECK_DOUBLE_RECORD_FRONTEND = "/api/v1/checkDoubleRecordFrontend";
+    private final static String PATH_DO_RECATEGORIZATION_THINGS = "/api/v1/doRecategorizationThings";
+    private final static String PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY = "/api/v1/recategorizationNoteFieldFactory";
+    private final static String PATH_BUILD_RECORD = "/api/v1/buildRecord";
+    private final static String PATH_SORT_RECORD = "/api/v1/sortRecord";
+    private final static String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
     private final OpencatBusinessConnector.LogLevelMethod logger;
 
     /**
@@ -111,7 +129,7 @@ public class OpencatBusinessConnector {
     public MessageEntryDTO[] validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final InputStream responseStream = sendPostRequest(PATH_OPENCATBUSINESS_SERVICE_VALIDATE_RECORD,
+            final InputStream responseStream = sendPostRequest(PATH_VALIDATE_RECORD,
                     Arrays.asList(schemaName, jsonbContext.marshall(marcRecord)), InputStream.class);
             return jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class);
         } finally {
@@ -130,12 +148,137 @@ public class OpencatBusinessConnector {
             requestDTO.setGroupId(groupId);
             requestDTO.setLibraryType(libraryType);
 
-            return sendPostRequest(PATH_OPENCAT_BUSINESS_SERVICE_CHECK_TEMPLATE_URL, requestDTO, Boolean.class);
+            return sendPostRequest(PATH_CHECK_TEMPLATE, requestDTO, Boolean.class);
         } finally {
             logger.log("checkTemplate took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
         }
+    }
 
+    public boolean checkTemplateBuild(String name) throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+
+            return sendPostRequest(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
+        } finally {
+            logger.log("checkTemplateBuild took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public DoubleRecordFrontendStatusDTO checkDoubleRecordFrontend(MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final CheckDoubleRecordFrontendRequestDTO requestDTO = new CheckDoubleRecordFrontendRequestDTO();
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+
+            return sendPostRequest(PATH_CHECK_DOUBLE_RECORD_FRONTEND, requestDTO, DoubleRecordFrontendStatusDTO.class);
+        } finally {
+            logger.log("checkDoubleRecordFrontend took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord doRecategorizationThings(MarcRecord currentRecord,
+                                               MarcRecord updateRecord,
+                                               MarcRecord newRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final DoRecategorizationThingsRequestDTO requestDTO = new DoRecategorizationThingsRequestDTO();
+            requestDTO.setCurrentRecord(jsonbContext.marshall(currentRecord));
+            requestDTO.setUpdateRecord(jsonbContext.marshall(updateRecord));
+            requestDTO.setNewRecord(jsonbContext.marshall(newRecord));
+
+            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
+
+            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+        } finally {
+            logger.log("doRecategorizationThings took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcField recategorizationNoteFieldFactory(MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final RecategorizationNoteFieldFactoryRequestDTO requestDTO = new RecategorizationNoteFieldFactoryRequestDTO();
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+
+            return sendPostRequest(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
+        } finally {
+            logger.log("recategorizationNoteFieldFactory took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord buildRecord(String templateName)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
+            requestDTO.setTemplateName(templateName);
+
+            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+
+            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+        } finally {
+            logger.log("buildRecord took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord buildRecord(String templateName, MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
+            requestDTO.setTemplateName(templateName);
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+
+            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+
+            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+        } finally {
+            logger.log("buildRecord took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord sortRecord(String templateProvider, MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final SortRecordRequestDTO requestDTO = new SortRecordRequestDTO();
+            requestDTO.setTemplateProvider(templateProvider);
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+
+            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
+
+            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+        } finally {
+            logger.log("sortRecord took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public SchemaDTO[] getValidateSchemas(String templateGroup, Set<String> allowedLibraryRules)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final GetValidateSchemasRequestDTO requestDTO = new GetValidateSchemasRequestDTO();
+            requestDTO.setTemplateGroup(templateGroup);
+            requestDTO.setAllowedLibraryRules(allowedLibraryRules);
+
+            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_GET_VALIDATE_SCHEMAS, requestDTO, RecordResponseDTO.class);
+
+            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), SchemaDTO[].class);
+        } finally {
+            logger.log("getValidateSchemas took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
     }
 
     private <T> T sendPostRequest(String basePath, Object request, Class<T> type)
