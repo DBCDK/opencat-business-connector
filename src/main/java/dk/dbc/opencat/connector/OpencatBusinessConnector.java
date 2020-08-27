@@ -10,11 +10,10 @@ import dk.dbc.invariant.InvariantUtil;
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
 import dk.dbc.opencatbusiness.dto.BuildRecordRequestDTO;
-import dk.dbc.opencatbusiness.dto.CheckDoubleRecordFrontendRequestDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateRequestDTO;
 import dk.dbc.opencatbusiness.dto.DoRecategorizationThingsRequestDTO;
 import dk.dbc.opencatbusiness.dto.GetValidateSchemasRequestDTO;
-import dk.dbc.opencatbusiness.dto.RecategorizationNoteFieldFactoryRequestDTO;
+import dk.dbc.opencatbusiness.dto.RecordRequestDTO;
 import dk.dbc.opencatbusiness.dto.RecordResponseDTO;
 import dk.dbc.opencatbusiness.dto.SortRecordRequestDTO;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
@@ -31,6 +30,7 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +54,7 @@ public class OpencatBusinessConnector {
     private final static String PATH_CHECK_TEMPLATE = "/api/v1/checkTemplate";
     private final static String PATH_CHECK_TEMPLATE_BUILD = "/api/v1/checkTemplateBuild";
     private final static String PATH_CHECK_DOUBLE_RECORD_FRONTEND = "/api/v1/checkDoubleRecordFrontend";
+    private final static String PATH_CHECK_DOUBLE_RECORD = "/api/v1/checkDoubleRecord";
     private final static String PATH_DO_RECATEGORIZATION_THINGS = "/api/v1/doRecategorizationThings";
     private final static String PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY = "/api/v1/recategorizationNoteFieldFactory";
     private final static String PATH_BUILD_RECORD = "/api/v1/buildRecord";
@@ -126,12 +127,12 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public MessageEntryDTO[] validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
+    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final InputStream responseStream = sendPostRequest(PATH_VALIDATE_RECORD,
+            final InputStream responseStream = sendPostRequestWithReturn(PATH_VALIDATE_RECORD,
                     Arrays.asList(schemaName, jsonbContext.marshall(marcRecord)), InputStream.class);
-            return jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class);
+            return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class));
         } finally {
             logger.log("validateRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -148,7 +149,7 @@ public class OpencatBusinessConnector {
             requestDTO.setGroupId(groupId);
             requestDTO.setLibraryType(libraryType);
 
-            return sendPostRequest(PATH_CHECK_TEMPLATE, requestDTO, Boolean.class);
+            return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE, requestDTO, Boolean.class);
         } finally {
             logger.log("checkTemplate took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -159,7 +160,7 @@ public class OpencatBusinessConnector {
         final Stopwatch stopwatch = new Stopwatch();
         try {
 
-            return sendPostRequest(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
+            return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
         } finally {
             logger.log("checkTemplateBuild took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -170,10 +171,24 @@ public class OpencatBusinessConnector {
             throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final CheckDoubleRecordFrontendRequestDTO requestDTO = new CheckDoubleRecordFrontendRequestDTO();
+            final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(jsonbContext.marshall(marcRecord));
 
-            return sendPostRequest(PATH_CHECK_DOUBLE_RECORD_FRONTEND, requestDTO, DoubleRecordFrontendStatusDTO.class);
+            return sendPostRequestWithReturn(PATH_CHECK_DOUBLE_RECORD_FRONTEND, requestDTO, DoubleRecordFrontendStatusDTO.class);
+        } finally {
+            logger.log("checkDoubleRecordFrontend took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public void checkDoubleRecord(MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final RecordRequestDTO requestDTO = new RecordRequestDTO();
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+
+            sendPostRequestWithoutReturn(PATH_CHECK_DOUBLE_RECORD, requestDTO);
         } finally {
             logger.log("checkDoubleRecordFrontend took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -191,7 +206,7 @@ public class OpencatBusinessConnector {
             requestDTO.setUpdateRecord(jsonbContext.marshall(updateRecord));
             requestDTO.setNewRecord(jsonbContext.marshall(newRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
+            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
             return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
         } finally {
@@ -204,10 +219,10 @@ public class OpencatBusinessConnector {
             throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final RecategorizationNoteFieldFactoryRequestDTO requestDTO = new RecategorizationNoteFieldFactoryRequestDTO();
+            final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(jsonbContext.marshall(marcRecord));
 
-            return sendPostRequest(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
+            return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
         } finally {
             logger.log("recategorizationNoteFieldFactory took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -221,7 +236,7 @@ public class OpencatBusinessConnector {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
             requestDTO.setTemplateName(templateName);
 
-            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
             return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
         } finally {
@@ -238,7 +253,7 @@ public class OpencatBusinessConnector {
             requestDTO.setTemplateName(templateName);
             requestDTO.setRecord(jsonbContext.marshall(marcRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
             return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
         } finally {
@@ -255,7 +270,7 @@ public class OpencatBusinessConnector {
             requestDTO.setTemplateProvider(templateProvider);
             requestDTO.setRecord(jsonbContext.marshall(marcRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
+            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
 
             return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
         } finally {
@@ -272,7 +287,7 @@ public class OpencatBusinessConnector {
             requestDTO.setTemplateGroup(templateGroup);
             requestDTO.setAllowedLibraryRules(allowedLibraryRules);
 
-            RecordResponseDTO recordResponseDTO = sendPostRequest(PATH_GET_VALIDATE_SCHEMAS, requestDTO, RecordResponseDTO.class);
+            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_GET_VALIDATE_SCHEMAS, requestDTO, RecordResponseDTO.class);
 
             return jsonbContext.unmarshall(recordResponseDTO.getRecord(), SchemaDTO[].class);
         } finally {
@@ -281,8 +296,20 @@ public class OpencatBusinessConnector {
         }
     }
 
-    private <T> T sendPostRequest(String basePath, Object request, Class<T> type)
+    private <T> T sendPostRequestWithReturn(String basePath, Object request, Class<T> type)
             throws OpencatBusinessConnectorException, JSONBException {
+        final Response response = sendPostRequest(basePath, request);
+        assertResponseStatus(response, Response.Status.OK);
+        return readResponseEntity(response, type);
+    }
+
+    private void sendPostRequestWithoutReturn(String basePath, Object request)
+            throws OpencatBusinessConnectorException, JSONBException {
+        final Response response = sendPostRequest(basePath, request);
+        assertResponseStatus(response, Response.Status.OK);
+    }
+
+    private Response sendPostRequest(String basePath, Object request) throws JSONBException {
         InvariantUtil.checkNotNullOrThrow(request, "request");
         final PathBuilder path = new PathBuilder(basePath);
         final HttpPost post = new HttpPost(failSafeHttpClient)
@@ -291,9 +318,7 @@ public class OpencatBusinessConnector {
                 .withHeader("Accept", "application/json")
                 .withPathElements(path.build());
 
-        final Response response = post.execute();
-        assertResponseStatus(response, Response.Status.OK);
-        return readResponseEntity(response, type);
+        return post.execute();
     }
 
     private <T> T readResponseEntity(Response response, Class<T> type)
