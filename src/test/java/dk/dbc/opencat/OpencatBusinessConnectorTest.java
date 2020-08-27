@@ -15,6 +15,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -50,8 +54,8 @@ public class OpencatBusinessConnectorTest {
     @Test
     void sanityCheckValidateRecordJSMethod() throws JSONBException, dk.dbc.jsonb.JSONBException, OpencatBusinessConnectorException {
         MarcRecord marcRecord = jsonbContext.unmarshall("{\"fields\":[{\"name\":\"001\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"68693268\"},{\"name\":\"b\",\"value\":\"870979\"},{\"name\":\"c\",\"value\":\"20181108150337\"},{\"name\":\"d\",\"value\":\"20131129\"},{\"name\":\"f\",\"value\":\"a\"},{\"name\":\"t\",\"value\":\"faust\"}]},{\"name\":\"004\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"r\",\"value\":\"n\"},{\"name\":\"a\",\"value\":\"e\"},{\"name\":\"x\",\"value\":\"n\"}]},{\"name\":\"008\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"t\",\"value\":\"h\"},{\"name\":\"v\",\"value\":\"9\"}]},{\"name\":\"025\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"5237167\"},{\"name\":\"2\",\"value\":\"viaf\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"025\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"0000000013134949\"},{\"name\":\"2\",\"value\":\"isni\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"040\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"DBC\"},{\"name\":\"b\",\"value\":\"dan\"}]},{\"name\":\"043\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"c\",\"value\":\"dk\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"100\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"Meilby\"},{\"name\":\"h\",\"value\":\"Mogens\"}]},{\"name\":\"375\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"1\"},{\"name\":\"2\",\"value\":\"iso5218\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"d08\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"o\",\"value\":\"autogenereret\"}]},{\"name\":\"xyz\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"u\",\"value\":\"MEILBYMOGENS\"}]},{\"name\":\"z98\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"Minus korrekturprint\"}]},{\"name\":\"z99\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"VIAF\"}]}]}", MarcRecord.class);
-        MessageEntryDTO[] expectedResponse = {};
-        MessageEntryDTO[] actualRespons = connector.validateRecord("dbcautoritet", marcRecord);
+        List<MessageEntryDTO> expectedResponse = new ArrayList<>();
+        List<MessageEntryDTO> actualRespons = connector.validateRecord("dbcautoritet", marcRecord);
         assertThat("OpencatBusiness returns empty list", actualRespons, is(expectedResponse));
     }
 
@@ -59,8 +63,8 @@ public class OpencatBusinessConnectorTest {
     void checkThatValidationErrorsIsProperlyReturned() throws JSONBException, dk.dbc.jsonb.JSONBException, OpencatBusinessConnectorException {
         MarcRecord marcRecord = jsonbContext.unmarshall("{\"fields\":[{\"name\":\"001\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"68693268\"},{\"name\":\"b\",\"value\":\"870980\"},{\"name\":\"c\",\"value\":\"20181108150337\"},{\"name\":\"d\",\"value\":\"20131129\"},{\"name\":\"f\",\"value\":\"a\"},{\"name\":\"t\",\"value\":\"faust\"}]},{\"name\":\"004\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"r\",\"value\":\"n\"},{\"name\":\"a\",\"value\":\"e\"},{\"name\":\"x\",\"value\":\"n\"}]},{\"name\":\"008\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"t\",\"value\":\"h\"},{\"name\":\"v\",\"value\":\"9\"}]},{\"name\":\"025\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"5237167\"},{\"name\":\"2\",\"value\":\"viaf\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"025\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"0000000013134949\"},{\"name\":\"2\",\"value\":\"isni\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"040\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"DBC\"},{\"name\":\"b\",\"value\":\"dan\"}]},{\"name\":\"043\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"c\",\"value\":\"dk\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"100\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"Meilby\"},{\"name\":\"h\",\"value\":\"Mogens\"}]},{\"name\":\"375\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"1\"},{\"name\":\"2\",\"value\":\"iso5218\"},{\"name\":\"&\",\"value\":\"VIAF\"}]},{\"name\":\"d08\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"o\",\"value\":\"autogenereret\"}]},{\"name\":\"xyz\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"u\",\"value\":\"MEILBYMOGENS\"}]},{\"name\":\"z98\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"Minus korrekturprint\"}]},{\"name\":\"z99\",\"indicator\":\"00\",\"subfields\":[{\"name\":\"a\",\"value\":\"VIAF\"}]}]}", MarcRecord.class);
         MessageEntryDTO[] expectedResponse = jsonbContext.unmarshall("[{\"type\":\"ERROR\",\"urlForDocumentation\":\"http://www.kat-format.dk/danMARC2/bilag_h/felt001.htm\",\"message\":\"Værdien '870980' er ikke en del af de valide værdier: '870979'\",\"ordinalPositionOfSubfield\":1,\"ordinalPositionOfField\":0}]", MessageEntryDTO[].class);
-        MessageEntryDTO[] actualRespons = connector.validateRecord("dbcautoritet", marcRecord);
-        assertThat("OpencatBusiness returns list with one validation error", actualRespons, is(expectedResponse));
+        List<MessageEntryDTO> actualRespons = connector.validateRecord("dbcautoritet", marcRecord);
+        assertThat("OpencatBusiness returns list with one validation error", actualRespons, is(Arrays.asList(expectedResponse)));
     }
 
     @Test
