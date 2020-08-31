@@ -16,6 +16,7 @@ import dk.dbc.opencatbusiness.dto.GetValidateSchemasRequestDTO;
 import dk.dbc.opencatbusiness.dto.RecordRequestDTO;
 import dk.dbc.opencatbusiness.dto.RecordResponseDTO;
 import dk.dbc.opencatbusiness.dto.SortRecordRequestDTO;
+import dk.dbc.opencatbusiness.dto.ValidateRecordRequestDTO;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
 import dk.dbc.updateservice.dto.SchemaDTO;
@@ -130,8 +131,11 @@ public class OpencatBusinessConnector {
     public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            final InputStream responseStream = sendPostRequestWithReturn(PATH_VALIDATE_RECORD,
-                    Arrays.asList(schemaName, jsonbContext.marshall(marcRecord)), InputStream.class);
+            final ValidateRecordRequestDTO requestDTO = new ValidateRecordRequestDTO();
+            requestDTO.setTemplateName(schemaName);
+            requestDTO.setRecord(jsonbContext.marshall(marcRecord));
+            final InputStream responseStream = sendPostRequestWithReturn(PATH_VALIDATE_RECORD, requestDTO, InputStream.class);
+
             return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class));
         } finally {
             logger.log("validateRecord took {} milliseconds",
@@ -159,7 +163,6 @@ public class OpencatBusinessConnector {
     public boolean checkTemplateBuild(String name) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-
             return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
         } finally {
             logger.log("checkTemplateBuild took {} milliseconds",

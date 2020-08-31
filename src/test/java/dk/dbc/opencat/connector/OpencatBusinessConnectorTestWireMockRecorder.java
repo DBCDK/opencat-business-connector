@@ -18,7 +18,13 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
                 OpencatBusinessConnectorTest.CLIENT, "http://localhost:8080");
         final OpencatBusinessConnectorTest opencatBusinessConnectorTest = new OpencatBusinessConnectorTest();
 
+        validateRecordTests(opencatBusinessConnectorTest);
         checkTemplateTests(opencatBusinessConnectorTest);
+    }
+
+    private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.checkThatValidationErrorsIsProperlyReturned();
+        connectorTest.sanityCheckValidateRecordJSMethod();
     }
 
     private static void checkTemplateTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
