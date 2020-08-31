@@ -1,29 +1,26 @@
-package dk.dbc.opencat;
+package dk.dbc.opencat.connector;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import dk.dbc.common.records.MarcRecord;
 import dk.dbc.dataio.jsonb.JSONBContext;
 import dk.dbc.dataio.jsonb.JSONBException;
 import dk.dbc.httpclient.HttpClient;
-import dk.dbc.opencat.connector.OpencatBusinessConnector;
-import dk.dbc.opencat.connector.OpencatBusinessConnectorException;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
-import javax.ws.rs.client.Client;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.ws.rs.client.Client;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class OpencatBusinessConnectorTest {
     private static WireMockServer wireMockServer;
@@ -49,7 +46,9 @@ public class OpencatBusinessConnectorTest {
     }
 
     @AfterAll
-    static void stopWiremockServer() { wireMockServer.stop(); }
+    static void stopWiremockServer() {
+        wireMockServer.stop();
+    }
 
     @Test
     void sanityCheckValidateRecordJSMethod() throws JSONBException, dk.dbc.jsonb.JSONBException, OpencatBusinessConnectorException {

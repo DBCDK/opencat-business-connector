@@ -1,6 +1,4 @@
-package dk.dbc.opencat;
-
-import dk.dbc.opencat.connector.OpencatBusinessConnector;
+package dk.dbc.opencat.connector;
 
 public class OpencatBusinessConnectorTestWireMockRecorder {
 
