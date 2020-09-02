@@ -1,5 +1,5 @@
 {
-  "id" : "45e7420e-6a7c-3135-9f83-3968c3ca074f",
+  "id" : "3c855409-95b8-34da-8807-a3d545d2f1c0",
   "request" : {
     "url" : "/api/v1/checkTemplate",
     "method" : "POST",
@@ -11,12 +11,12 @@
   },
   "response" : {
     "status" : 200,
-    "bodyFileName" : "body-api-v1-checkTemplate-sS2Jm.json",
+    "bodyFileName" : "body-api-v1-checkTemplate-sLzZ1.json",
     "headers" : {
       "Server" : "Payara Micro #badassfish",
       "Content-Type" : "application/json",
       "X-Frame-Options" : "SAMEORIGIN"
     }
   },
-  "uuid" : "45e7420e-6a7c-3135-9f83-3968c3ca074f"
+  "uuid" : "3c855409-95b8-34da-8807-a3d545d2f1c0"
 }
