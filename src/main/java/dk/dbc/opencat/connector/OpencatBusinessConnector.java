@@ -136,7 +136,7 @@ public class OpencatBusinessConnector {
         try {
             final ValidateRecordRequestDTO requestDTO = new ValidateRecordRequestDTO();
             requestDTO.setTemplateName(schemaName);
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
             final InputStream responseStream = sendPostRequestWithReturn(PATH_VALIDATE_RECORD, requestDTO, InputStream.class);
 
             return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class));
@@ -178,7 +178,7 @@ public class OpencatBusinessConnector {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
             return sendPostRequestWithReturn(PATH_CHECK_DOUBLE_RECORD_FRONTEND, requestDTO, DoubleRecordFrontendStatusDTO.class);
         } finally {
@@ -192,7 +192,7 @@ public class OpencatBusinessConnector {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
             sendPostRequestWithoutReturn(PATH_CHECK_DOUBLE_RECORD, requestDTO);
         } finally {
@@ -208,9 +208,9 @@ public class OpencatBusinessConnector {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final DoRecategorizationThingsRequestDTO requestDTO = new DoRecategorizationThingsRequestDTO();
-            requestDTO.setCurrentRecord(new String(RecordContentTransformer.encodeRecord(currentRecord)));
-            requestDTO.setUpdateRecord(new String(RecordContentTransformer.encodeRecord(updateRecord)));
-            requestDTO.setNewRecord(new String(RecordContentTransformer.encodeRecord(newRecord)));
+            requestDTO.setCurrentRecord(marcRecordToDTOString(currentRecord));
+            requestDTO.setUpdateRecord(marcRecordToDTOString(updateRecord));
+            requestDTO.setNewRecord(marcRecordToDTOString(newRecord));
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
@@ -226,7 +226,7 @@ public class OpencatBusinessConnector {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
             return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
         } finally {
@@ -257,7 +257,7 @@ public class OpencatBusinessConnector {
         try {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
             requestDTO.setTemplateName(templateName);
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
@@ -274,7 +274,7 @@ public class OpencatBusinessConnector {
         try {
             final SortRecordRequestDTO requestDTO = new SortRecordRequestDTO();
             requestDTO.setTemplateProvider(templateProvider);
-            requestDTO.setRecord(new String(RecordContentTransformer.encodeRecord(marcRecord)));
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
 
@@ -346,6 +346,19 @@ public class OpencatBusinessConnector {
                     String.format("OpencatBusiness returned with '%s' status code: %s",
                             actualStatus,
                             actualStatus.getStatusCode()));
+        }
+    }
+
+    private String marcRecordToDTOString(MarcRecord marcRecord) throws JAXBException, UnsupportedEncodingException {
+        if (marcRecord == null) {
+            return null;
+        } else {
+            byte[] recordBytes = RecordContentTransformer.encodeRecord(marcRecord);
+            if (recordBytes == null) {
+                return null;
+            } else {
+                return new String(recordBytes);
+            }
         }
     }
 
