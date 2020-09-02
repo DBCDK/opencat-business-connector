@@ -8,6 +8,7 @@ import dk.dbc.httpclient.HttpClient;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendDTO;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
+import dk.dbc.updateservice.dto.SchemaDTO;
 import dk.dbc.updateservice.dto.TypeEnumDTO;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -16,7 +17,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.client.Client;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -28,7 +31,6 @@ public class OpencatBusinessConnectorTest {
     private static WireMockServer wireMockServer;
     private static String wireMockHost;
     static OpencatBusinessConnector connector;
-    private final JSONBContext jsonbContext = new JSONBContext();
 
     final static Client CLIENT = HttpClient.newClient(new ClientConfig()
             .register(new JacksonFeature()));
@@ -384,4 +386,39 @@ public class OpencatBusinessConnectorTest {
 
         assertThat("Check status for checkDoubleRecordFrontend", actual, is(expectedStatus));
     }
+
+    @Test
+    void getValidateSchemas_dbc() throws Exception {
+        final List<SchemaDTO> actual = connector.getValidateSchemas("dbc", new HashSet<>());
+
+        final List<SchemaDTO> expected = new ArrayList<>();
+
+        final SchemaDTO allowAll = new SchemaDTO();
+        allowAll.setSchemaName("allowall");
+        allowAll.setSchemaInfo("");
+        expected.add(allowAll);
+
+        final SchemaDTO BCIbog = new SchemaDTO();
+        BCIbog.setSchemaName("BCIbog");
+        BCIbog.setSchemaInfo("Skabelon til katalogisering af fysiske bøger - enkeltstående post.");
+        expected.add(BCIbog);
+
+        final SchemaDTO BCIbogbind = new SchemaDTO();
+        BCIbogbind.setSchemaName("BCIbogbind");
+        BCIbogbind.setSchemaInfo("Skabelon til katalogisering af flerbindsværk af fysiske bøger - bindpost.");
+        expected.add(BCIbogbind);
+
+        final SchemaDTO BCIboghoved = new SchemaDTO();
+        BCIboghoved.setSchemaName("BCIboghoved");
+        BCIboghoved.setSchemaInfo("Skabelon til katalogisering af flerbindsværk af fysiske bøger - hovedpost.");
+        expected.add(BCIboghoved);
+
+        final SchemaDTO dbclittolk = new SchemaDTO();
+        dbclittolk.setSchemaName("dbclittolk");
+        dbclittolk.setSchemaInfo("");
+        expected.add(dbclittolk);
+
+        assertThat("List of schemas", actual, is(expected));
+    }
+
 }

@@ -1,0 +1,22 @@
+[
+  {
+    "schemaName": "allowall",
+    "schemaInfo": ""
+  },
+  {
+    "schemaName": "BCIbog",
+    "schemaInfo": "Skabelon til katalogisering af fysiske bøger - enkeltstående post."
+  },
+  {
+    "schemaName": "BCIbogbind",
+    "schemaInfo": "Skabelon til katalogisering af flerbindsværk af fysiske bøger - bindpost."
+  },
+  {
+    "schemaName": "BCIboghoved",
+    "schemaInfo": "Skabelon til katalogisering af flerbindsværk af fysiske bøger - hovedpost."
+  },
+  {
+    "schemaName": "dbclittolk",
+    "schemaInfo": ""
+  }
+]

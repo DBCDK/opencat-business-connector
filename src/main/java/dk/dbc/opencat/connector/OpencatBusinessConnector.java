@@ -285,17 +285,16 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public SchemaDTO[] getValidateSchemas(String templateGroup, Set<String> allowedLibraryRules)
+    public List<SchemaDTO> getValidateSchemas(String templateGroup, Set<String> allowedLibraryRules)
             throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final GetValidateSchemasRequestDTO requestDTO = new GetValidateSchemasRequestDTO();
             requestDTO.setTemplateGroup(templateGroup);
             requestDTO.setAllowedLibraryRules(allowedLibraryRules);
+            final InputStream responseStream = sendPostRequestWithReturn(PATH_GET_VALIDATE_SCHEMAS, requestDTO, InputStream.class);
 
-            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_GET_VALIDATE_SCHEMAS, requestDTO, RecordResponseDTO.class);
-
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), SchemaDTO[].class);
+            return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), SchemaDTO[].class));
         } finally {
             logger.log("getValidateSchemas took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));

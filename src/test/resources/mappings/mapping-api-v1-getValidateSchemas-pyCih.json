@@ -1,0 +1,22 @@
+{
+  "id" : "a8921d91-1d0a-3e54-af2d-577bbc493465",
+  "request" : {
+    "url" : "/api/v1/getValidateSchemas",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"templateGroup\":\"dbc\",\"allowedLibraryRules\":[]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-getValidateSchemas-pyCih.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "a8921d91-1d0a-3e54-af2d-577bbc493465"
+}
