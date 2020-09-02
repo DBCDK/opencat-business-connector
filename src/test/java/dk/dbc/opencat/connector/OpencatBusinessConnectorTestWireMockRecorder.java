@@ -21,8 +21,9 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
         validateRecordTests(opencatBusinessConnectorTest);
         checkTemplateTests(opencatBusinessConnectorTest);
         checkTemplateBuildTests(opencatBusinessConnectorTest);
-        doubleRecordFrontendTest(opencatBusinessConnectorTest);
-        getValidateSchemasTest(opencatBusinessConnectorTest);
+        doubleRecordFrontendTests(opencatBusinessConnectorTest);
+        getValidateSchemasTests(opencatBusinessConnectorTest);
+        sortRecordTests(opencatBusinessConnectorTest);
     }
 
     private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
@@ -40,12 +41,16 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
         connectorTest.checkTemplateBuild_false();
     }
 
-    private static void doubleRecordFrontendTest(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void doubleRecordFrontendTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
         connectorTest.checkDoubleRecordFrontend_ok();
         connectorTest.checkDoubleRecordFrontend_fail();
     }
 
-    private static void getValidateSchemasTest(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void getValidateSchemasTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
         connectorTest.getValidateSchemas_dbc();
+    }
+
+    private static void sortRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.sortRecord();
     }
 }

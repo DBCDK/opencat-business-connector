@@ -278,7 +278,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("sortRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
