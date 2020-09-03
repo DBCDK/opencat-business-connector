@@ -1,3 +1,8 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
+ */
+
 package dk.dbc.opencat.connector;
 
 import dk.dbc.common.records.MarcField;
@@ -38,6 +43,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * OpencatBusinessConnector - opencat-business service client
+ * <p>
+ * To use this class, you construct an instance, specifying a web resources client as well as
+ * a base URL for the opencat-business service endpoint you will be communicating with.
+ * </p>
+ * <p>
+ * This class is thread safe, as long as the given web resources client remains thread safe.
+ * </p>
+ * <p>
+ * Service home: https://github.com/DBCDK/opencat-business
+ * </p>
+ */
 public class OpencatBusinessConnector {
     JSONBContext jsonbContext = new JSONBContext();
 
@@ -46,25 +64,26 @@ public class OpencatBusinessConnector {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpencatBusinessConnector.class);
+    private static final String PATH_VALIDATE_RECORD = "/api/v1/validateRecord";
+    private static final String PATH_CHECK_TEMPLATE = "/api/v1/checkTemplate";
+    private static final String PATH_CHECK_TEMPLATE_BUILD = "/api/v1/checkTemplateBuild";
+    private static final String PATH_CHECK_DOUBLE_RECORD_FRONTEND = "/api/v1/checkDoubleRecordFrontend";
+    private static final String PATH_CHECK_DOUBLE_RECORD = "/api/v1/checkDoubleRecord";
+    private static final String PATH_DO_RECATEGORIZATION_THINGS = "/api/v1/doRecategorizationThings";
+    private static final String PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY = "/api/v1/recategorizationNoteFieldFactory";
+    private static final String PATH_BUILD_RECORD = "/api/v1/buildRecord";
+    private static final String PATH_SORT_RECORD = "/api/v1/sortRecord";
+    private static final String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
+
     private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
             .retryOn(Collections.singletonList(ProcessingException.class))
             .retryIf((Response response) -> response.getStatus() == 404)
             .withDelay(10, TimeUnit.SECONDS)
-            .withMaxRetries(1);
+            .withMaxRetries(6);
 
     private final FailSafeHttpClient failSafeHttpClient;
     private final String baseUrl;
-    private static final String PATH_VALIDATE_RECORD = "/api/v1/validateRecord";
-    private final static String PATH_CHECK_TEMPLATE = "/api/v1/checkTemplate";
-    private final static String PATH_CHECK_TEMPLATE_BUILD = "/api/v1/checkTemplateBuild";
-    private final static String PATH_CHECK_DOUBLE_RECORD_FRONTEND = "/api/v1/checkDoubleRecordFrontend";
-    private final static String PATH_CHECK_DOUBLE_RECORD = "/api/v1/checkDoubleRecord";
-    private final static String PATH_DO_RECATEGORIZATION_THINGS = "/api/v1/doRecategorizationThings";
-    private final static String PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY = "/api/v1/recategorizationNoteFieldFactory";
-    private final static String PATH_BUILD_RECORD = "/api/v1/buildRecord";
-    private final static String PATH_SORT_RECORD = "/api/v1/sortRecord";
-    private final static String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
-    private final OpencatBusinessConnector.LogLevelMethod logger;
+    private final LogLevelMethod logger;
 
     /**
      * Returns new instance with default retry policy
@@ -73,7 +92,7 @@ public class OpencatBusinessConnector {
      * @param baseUrl    base URL for opencatbusiness service endpoint
      */
     public OpencatBusinessConnector(Client httpClient, String baseUrl) {
-        this(FailSafeHttpClient.create(httpClient, RETRY_POLICY), baseUrl, OpencatBusinessConnector.TimingLogLevel.INFO);
+        this(FailSafeHttpClient.create(httpClient, RETRY_POLICY), baseUrl, TimingLogLevel.INFO);
     }
 
     /**
@@ -83,7 +102,7 @@ public class OpencatBusinessConnector {
      * @param baseUrl    base URL for opencatbusiness service endpoint
      * @param level      timings log level
      */
-    public OpencatBusinessConnector(Client httpClient, String baseUrl, OpencatBusinessConnector.TimingLogLevel level) {
+    public OpencatBusinessConnector(Client httpClient, String baseUrl, TimingLogLevel level) {
         this(FailSafeHttpClient.create(httpClient, RETRY_POLICY), baseUrl, level);
     }
 
@@ -94,7 +113,7 @@ public class OpencatBusinessConnector {
      * @param baseUrl            base URL for opencatbusiness service endpoint
      */
     public OpencatBusinessConnector(FailSafeHttpClient failSafeHttpClient, String baseUrl) {
-        this(failSafeHttpClient, baseUrl, OpencatBusinessConnector.TimingLogLevel.INFO);
+        this(failSafeHttpClient, baseUrl, TimingLogLevel.INFO);
     }
 
     /**
@@ -104,7 +123,7 @@ public class OpencatBusinessConnector {
      * @param baseUrl            base URL for opencatbusiness service endpoint
      * @param level              timings log level
      */
-    public OpencatBusinessConnector(FailSafeHttpClient failSafeHttpClient, String baseUrl, OpencatBusinessConnector.TimingLogLevel level) {
+    public OpencatBusinessConnector(FailSafeHttpClient failSafeHttpClient, String baseUrl, TimingLogLevel level) {
         this.failSafeHttpClient = InvariantUtil.checkNotNullOrThrow(
                 failSafeHttpClient, "failSafeHttpClient");
         this.baseUrl = InvariantUtil.checkNotNullNotEmptyOrThrow(
@@ -129,6 +148,10 @@ public class OpencatBusinessConnector {
                 logger = LOGGER::info;
                 break;
         }
+    }
+
+    public void close() {
+        failSafeHttpClient.getClient().close();
     }
 
     public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
@@ -360,10 +383,6 @@ public class OpencatBusinessConnector {
                 return new String(recordBytes);
             }
         }
-    }
-
-    public void close() {
-        failSafeHttpClient.getClient().close();
     }
 
     @FunctionalInterface
