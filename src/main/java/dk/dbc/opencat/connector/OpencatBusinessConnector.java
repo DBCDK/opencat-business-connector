@@ -16,6 +16,8 @@ import dk.dbc.invariant.InvariantUtil;
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
 import dk.dbc.opencatbusiness.dto.BuildRecordRequestDTO;
+import dk.dbc.opencatbusiness.dto.CheckTemplateBuildRequestDTO;
+import dk.dbc.opencatbusiness.dto.CheckTemplateBuildResponseDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateRequestDTO;
 import dk.dbc.opencatbusiness.dto.DoRecategorizationThingsRequestDTO;
 import dk.dbc.opencatbusiness.dto.GetValidateSchemasRequestDTO;
@@ -189,7 +191,11 @@ public class OpencatBusinessConnector {
     public boolean checkTemplateBuild(String name) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
+            final CheckTemplateBuildRequestDTO requestDTO = new CheckTemplateBuildRequestDTO();
+            requestDTO.setName(name);
+
+            CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
+            return responseDTO.isResult();
         } finally {
             logger.log("checkTemplateBuild took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -237,7 +243,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("doRecategorizationThings took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -259,7 +265,7 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord buildRecord(String templateName)
-            throws OpencatBusinessConnectorException, JSONBException {
+            throws OpencatBusinessConnectorException, JSONBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
@@ -267,7 +273,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("buildRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -284,7 +290,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("buildRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
