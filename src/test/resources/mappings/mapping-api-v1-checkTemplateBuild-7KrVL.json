@@ -1,0 +1,22 @@
+{
+  "id" : "b82710b9-783f-3ceb-9e46-4c8edb2d714e",
+  "request" : {
+    "url" : "/api/v1/checkTemplateBuild",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"name\":\"julemand\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-checkTemplateBuild-7KrVL.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "b82710b9-783f-3ceb-9e46-4c8edb2d714e"
+}

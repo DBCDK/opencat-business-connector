@@ -24,6 +24,8 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
         doubleRecordFrontendTests(opencatBusinessConnectorTest);
         getValidateSchemasTests(opencatBusinessConnectorTest);
         sortRecordTests(opencatBusinessConnectorTest);
+        preprocessTests(opencatBusinessConnectorTest);
+        metacompassTests(opencatBusinessConnectorTest);
     }
 
     private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
@@ -52,5 +54,13 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
 
     private static void sortRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
         connectorTest.sortRecord();
+    }
+
+    private static void preprocessTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.preprocess();
+    }
+
+    private static void metacompassTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.metacompass();
     }
 }

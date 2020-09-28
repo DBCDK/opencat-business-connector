@@ -11,6 +11,8 @@ import dk.dbc.invariant.InvariantUtil;
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
 import dk.dbc.opencatbusiness.dto.BuildRecordRequestDTO;
+import dk.dbc.opencatbusiness.dto.CheckTemplateBuildRequestDTO;
+import dk.dbc.opencatbusiness.dto.CheckTemplateBuildResponseDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateRequestDTO;
 import dk.dbc.opencatbusiness.dto.DoRecategorizationThingsRequestDTO;
 import dk.dbc.opencatbusiness.dto.GetValidateSchemasRequestDTO;
@@ -64,6 +66,8 @@ public class OpencatBusinessConnector {
     private final static String PATH_BUILD_RECORD = "/api/v1/buildRecord";
     private final static String PATH_SORT_RECORD = "/api/v1/sortRecord";
     private final static String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
+    private final static String PATH_PRE_PROCESS = "/api/v1/preprocess";
+    private final static String PATH_META_COMPASS = "/api/v1/metacompass";
     private final OpencatBusinessConnector.LogLevelMethod logger;
 
     /**
@@ -166,7 +170,12 @@ public class OpencatBusinessConnector {
     public boolean checkTemplateBuild(String name) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, name, Boolean.class);
+            CheckTemplateBuildRequestDTO requestDTO = new CheckTemplateBuildRequestDTO();
+            requestDTO.setName(name);
+
+            CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
+
+            return  responseDTO.isResult();
         } finally {
             logger.log("checkTemplateBuild took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -297,6 +306,36 @@ public class OpencatBusinessConnector {
             return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), SchemaDTO[].class));
         } finally {
             logger.log("getValidateSchemas took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord preprocess(MarcRecord marcRecord) throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final RecordRequestDTO requestDTO = new RecordRequestDTO();
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_PRE_PROCESS, requestDTO, RecordResponseDTO.class);
+
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
+        } finally {
+            logger.log("preprocess took {} milliseconds",
+                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
+        }
+    }
+
+    public MarcRecord metacompass(MarcRecord marcRecord) throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+        final Stopwatch stopwatch = new Stopwatch();
+        try {
+            final RecordRequestDTO requestDTO = new RecordRequestDTO();
+            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_META_COMPASS, requestDTO, RecordResponseDTO.class);
+
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
+        } finally {
+            logger.log("metacompass took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
         }
     }

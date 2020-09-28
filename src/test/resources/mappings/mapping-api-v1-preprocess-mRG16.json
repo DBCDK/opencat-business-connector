@@ -1,0 +1,22 @@
+{
+  "id" : "d2a75847-49b5-3dca-815d-4f0d54fbfb6e",
+  "request" : {
+    "url" : "/api/v1/preprocess",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"record\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" standalone=\\\"yes\\\"?><record xsi:schemaLocation=\\\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\\\" xmlns=\\\"info:lc/xmlns/marcxchange-v1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\"><leader>00000n    2200000   4500</leader><datafield tag=\\\"001\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">5 279 335 1</subfield><subfield code=\\\"b\\\">870970</subfield><subfield code=\\\"c\\\">20170111180146</subfield><subfield code=\\\"d\\\">20161130</subfield><subfield code=\\\"f\\\">a</subfield></datafield><datafield tag=\\\"004\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"r\\\">n</subfield><subfield code=\\\"a\\\">b</subfield></datafield><datafield tag=\\\"008\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"t\\\">m</subfield><subfield code=\\\"u\\\">f</subfield><subfield code=\\\"o\\\">s</subfield><subfield code=\\\"x\\\">02</subfield><subfield code=\\\"v\\\">0</subfield></datafield><datafield tag=\\\"014\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">5 284 764 8</subfield></datafield><datafield tag=\\\"021\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"e\\\">9788771299311</subfield><subfield code=\\\"c\\\">ib.</subfield></datafield><datafield tag=\\\"032\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"x\\\">ACC201648</subfield><subfield code=\\\"a\\\">DBF201703</subfield><subfield code=\\\"x\\\">BKM201703</subfield></datafield><datafield tag=\\\"245\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">42 aktiviteter, du selv kan lave</subfield></datafield><datafield tag=\\\"250\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">1. udgave</subfield><subfield code=\\\"b\\\">$-</subfield></datafield><datafield tag=\\\"300\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">171 sider</subfield><subfield code=\\\"b\\\">ill. i farver</subfield></datafield><datafield tag=\\\"504\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"&amp;\\\">1</subfield><subfield code=\\\"a\\\">Aktivitetsbog med 42 aktiviteter, opdelt i 40 kapitler, som knytter sig til danmarkshistorien. Aktiviteterne er en blanding af madopskrifter, lege, spil og ting. Alle med illustreret trin for trin guide og materialeliste</subfield></datafield><datafield tag=\\\"521\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"b\\\">1. oplag</subfield><subfield code=\\\"c\\\">2016</subfield><subfield code=\\\"k\\\">Specialtrykkeriet, Viborg</subfield></datafield><datafield tag=\\\"666\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"0\\\"></subfield><subfield code=\\\"o\\\">idebøger</subfield></datafield><datafield tag=\\\"666\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"u\\\">for 9-10 år</subfield></datafield><datafield tag=\\\"720\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"o\\\">Ida Mary Walker Larsen</subfield><subfield code=\\\"4\\\">ill</subfield></datafield><datafield tag=\\\"720\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"o\\\">Dennis Hornhave Jacobsen</subfield><subfield code=\\\"4\\\">ill</subfield></datafield><datafield tag=\\\"990\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"o\\\">201703</subfield><subfield code=\\\"b\\\">l</subfield><subfield code=\\\"b\\\">b</subfield><subfield code=\\\"b\\\">s</subfield><subfield code=\\\"u\\\">nt</subfield></datafield><datafield tag=\\\"996\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">DBC</subfield></datafield></record>\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-preprocess-mRG16.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "d2a75847-49b5-3dca-815d-4f0d54fbfb6e"
+}

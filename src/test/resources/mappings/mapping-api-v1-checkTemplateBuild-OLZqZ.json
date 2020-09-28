@@ -1,0 +1,22 @@
+{
+  "id" : "a814282d-fd9c-3325-aa3a-965d0f08e6a5",
+  "request" : {
+    "url" : "/api/v1/checkTemplateBuild",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"name\":\"allowall\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-checkTemplateBuild-OLZqZ.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "a814282d-fd9c-3325-aa3a-965d0f08e6a5"
+}
