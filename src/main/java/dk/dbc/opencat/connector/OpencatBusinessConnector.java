@@ -214,7 +214,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("doRecategorizationThings took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -236,7 +236,7 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord buildRecord(String templateName)
-            throws OpencatBusinessConnectorException, JSONBException {
+            throws OpencatBusinessConnectorException, JSONBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
@@ -244,7 +244,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("buildRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -261,7 +261,7 @@ public class OpencatBusinessConnector {
 
             RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
-            return jsonbContext.unmarshall(recordResponseDTO.getRecord(), MarcRecord.class);
+            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
             logger.log("buildRecord took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
