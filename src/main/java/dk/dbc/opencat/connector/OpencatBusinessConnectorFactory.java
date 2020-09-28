@@ -19,6 +19,33 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 
+/**
+ * OpencatBusinessConnector factory
+ * <p>
+ * Synopsis:
+ * </p>
+ * <pre>
+ *    // New instance
+ *    OpencatBusinessConnector obc = OpencatBusinessConnector.create("http://opencat-business-service");
+ *
+ *    // Singleton instance in CDI enabled environment
+ *    {@literal @}Inject
+ *    OpencatBusinessConnectorFactory factory;
+ *    ...
+ *    OpencatBusinessConnector rsc = factory.getInstance();
+ *
+ *    // or simply
+ *    {@literal @}Inject
+ *    OpencatBusinessConnector rsc;
+ * </pre>
+ * <p>
+ * CDI case depends on the opencat-business baseurl being defined as
+ * the value of either a system property or environment variable
+ * named OPENCAT_BUSINESS_URL. OPENCAT_BUSINESS_TIMING_LOG_LEVEL
+ * should be one of TRACE, DEBUG, INFO(default), WARN or ERROR, for setting
+ * log level
+ * </p>
+ */
 @ApplicationScoped
 public class OpencatBusinessConnectorFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpencatBusinessConnectorFactory.class);
