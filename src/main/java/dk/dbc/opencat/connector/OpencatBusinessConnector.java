@@ -76,6 +76,8 @@ public class OpencatBusinessConnector {
     private static final String PATH_BUILD_RECORD = "/api/v1/buildRecord";
     private static final String PATH_SORT_RECORD = "/api/v1/sortRecord";
     private static final String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
+    private final static String PATH_PRE_PROCESS = "/api/v1/preprocess";
+    private final static String PATH_META_COMPASS = "/api/v1/metacompass";
 
     private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
             .retryOn(Collections.singletonList(ProcessingException.class))
@@ -86,20 +88,6 @@ public class OpencatBusinessConnector {
     private final FailSafeHttpClient failSafeHttpClient;
     private final String baseUrl;
     private final LogLevelMethod logger;
-
-    private static final String PATH_VALIDATE_RECORD = "/api/v1/validateRecord";
-    private final static String PATH_CHECK_TEMPLATE = "/api/v1/checkTemplate";
-    private final static String PATH_CHECK_TEMPLATE_BUILD = "/api/v1/checkTemplateBuild";
-    private final static String PATH_CHECK_DOUBLE_RECORD_FRONTEND = "/api/v1/checkDoubleRecordFrontend";
-    private final static String PATH_CHECK_DOUBLE_RECORD = "/api/v1/checkDoubleRecord";
-    private final static String PATH_DO_RECATEGORIZATION_THINGS = "/api/v1/doRecategorizationThings";
-    private final static String PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY = "/api/v1/recategorizationNoteFieldFactory";
-    private final static String PATH_BUILD_RECORD = "/api/v1/buildRecord";
-    private final static String PATH_SORT_RECORD = "/api/v1/sortRecord";
-    private final static String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
-    private final static String PATH_PRE_PROCESS = "/api/v1/preprocess";
-    private final static String PATH_META_COMPASS = "/api/v1/metacompass";
-    private final OpencatBusinessConnector.LogLevelMethod logger;
 
     /**
      * Returns new instance with default retry policy
@@ -208,7 +196,7 @@ public class OpencatBusinessConnector {
             CheckTemplateBuildRequestDTO requestDTO = new CheckTemplateBuildRequestDTO();
             requestDTO.setName(name);
 
-            CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
+            final CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
 
             return  responseDTO.isResult();
         } finally {
@@ -256,7 +244,7 @@ public class OpencatBusinessConnector {
             requestDTO.setUpdateRecord(marcRecordToDTOString(updateRecord));
             requestDTO.setNewRecord(marcRecordToDTOString(newRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
             return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
@@ -286,7 +274,7 @@ public class OpencatBusinessConnector {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
             requestDTO.setTemplateName(templateName);
 
-            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
             return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
@@ -303,7 +291,7 @@ public class OpencatBusinessConnector {
             requestDTO.setTemplateName(templateName);
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
             return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
@@ -320,7 +308,7 @@ public class OpencatBusinessConnector {
             requestDTO.setTemplateProvider(templateProvider);
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
 
-            RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
+            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
 
             return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
         } finally {
