@@ -25,6 +25,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OpencatBusinessConnectorTest {
     private static WireMockServer wireMockServer;
@@ -1011,6 +1012,38 @@ public class OpencatBusinessConnectorTest {
         final MarcRecord actual = connector.metacompass(marcRecord);
 
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    void metacompass_ErrorCheck() throws Exception {
+        final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "  <leader>00000     22000000 4500 </leader>\n" +
+                "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "    <subfield code=\"a\">90004158</subfield>\n" +
+                "    <subfield code=\"b\">870970</subfield>\n" +
+                "    <subfield code=\"c\">20150304180759</subfield>\n" +
+                "    <subfield code=\"d\">20141209</subfield>\n" +
+                "    <subfield code=\"f\">a</subfield>\n" +
+                "  </datafield>\n" +
+                "  <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "    <subfield code=\"r\">n</subfield>\n" +
+                "    <subfield code=\"a\">e</subfield>\n" +
+                "  </datafield>\n" +
+                "  <datafield ind1=\"0\" ind2=\"0\" tag=\"665\">\n" +
+                "    <subfield code=\"q\">København</subfield>\n" +
+                "    <subfield code=\"i\">istiden</subfield>\n" +
+                "  </datafield>\n" +
+                "</record>\n";
+
+        final MarcRecord marcRecord = RecordContentTransformer.decodeRecord(marcString.getBytes());
+
+        OpencatBusinessConnectorException thrown = assertThrows(
+                OpencatBusinessConnectorException.class,
+                () -> connector.metacompass(marcRecord),
+                "Expected connector.metacompass() to throw, but it didn't"
+        );
+
+        assertThat(thrown.getMessage(), is("Posten 90004158:870970 findes ikke eller er slettet"));
     }
 
 }

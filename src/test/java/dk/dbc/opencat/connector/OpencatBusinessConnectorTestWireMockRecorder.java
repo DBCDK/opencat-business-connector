@@ -62,5 +62,6 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
 
     private static void metacompassTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
         connectorTest.metacompass();
+        connectorTest.metacompass_ErrorCheck();
     }
 }

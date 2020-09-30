@@ -1,0 +1,22 @@
+{
+  "id" : "9a5a7104-3c65-35a3-97f2-8b34c317daa4",
+  "request" : {
+    "url" : "/api/v1/metacompass",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"record\":\"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" standalone=\\\"yes\\\"?><record xsi:schemaLocation=\\\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\\\" xmlns=\\\"info:lc/xmlns/marcxchange-v1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\"><leader>00000n    2200000   4500</leader><datafield tag=\\\"001\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"a\\\">90004158</subfield><subfield code=\\\"b\\\">870970</subfield><subfield code=\\\"c\\\">20150304180759</subfield><subfield code=\\\"d\\\">20141209</subfield><subfield code=\\\"f\\\">a</subfield></datafield><datafield tag=\\\"004\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"r\\\">n</subfield><subfield code=\\\"a\\\">e</subfield></datafield><datafield tag=\\\"665\\\" ind1=\\\"0\\\" ind2=\\\"0\\\"><subfield code=\\\"q\\\">København</subfield><subfield code=\\\"i\\\">istiden</subfield></datafield></record>\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 400,
+    "bodyFileName" : "body-api-v1-metacompass-CEyNt.txt",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "text/plain",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "9a5a7104-3c65-35a3-97f2-8b34c317daa4"
+}

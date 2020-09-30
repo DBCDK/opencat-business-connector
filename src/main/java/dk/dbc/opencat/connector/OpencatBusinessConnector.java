@@ -404,10 +404,14 @@ public class OpencatBusinessConnector {
         final Response.Status actualStatus =
                 Response.Status.fromStatusCode(response.getStatus());
         if (actualStatus != expectedStatus) {
-            throw new OpencatBusinessConnectorException(
-                    String.format("OpencatBusiness returned with '%s' status code: %s",
-                            actualStatus,
-                            actualStatus.getStatusCode()));
+            if (actualStatus == Response.Status.INTERNAL_SERVER_ERROR) {
+                // Error message in Danish as this will properly be shown to a user
+                throw new OpencatBusinessConnectorException("Det skete en uventet fejl i opencat-business");
+            } else {
+                // In case the error is not internal server error the exception will probably contain a validation
+                // message which should be shown to the user
+                throw new OpencatBusinessConnectorException(response.readEntity(String.class));
+            }
         }
     }
 
