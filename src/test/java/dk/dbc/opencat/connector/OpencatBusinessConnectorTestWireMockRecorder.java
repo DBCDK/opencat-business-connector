@@ -18,18 +18,18 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
                 OpencatBusinessConnectorTest.CLIENT, "http://localhost:8081");
         final OpencatBusinessConnectorTest opencatBusinessConnectorTest = new OpencatBusinessConnectorTest();
 
-//        validateRecordTests(opencatBusinessConnectorTest);
-//        checkTemplateTests(opencatBusinessConnectorTest);
-//        checkTemplateBuildTests(opencatBusinessConnectorTest);
-//        doubleRecordFrontendTests(opencatBusinessConnectorTest);
-        //checkDoubleRecord(opencatBusinessConnectorTest);
-        //doRecategorizationThingsTests(opencatBusinessConnectorTest);
-        //recategorizationNoteFieldFactoryTests(opencatBusinessConnectorTest);
+        validateRecordTests(opencatBusinessConnectorTest);
+        checkTemplateTests(opencatBusinessConnectorTest);
+        checkTemplateBuildTests(opencatBusinessConnectorTest);
+        doubleRecordFrontendTests(opencatBusinessConnectorTest);
+        checkDoubleRecord(opencatBusinessConnectorTest);
+        doRecategorizationThingsTests(opencatBusinessConnectorTest);
+        recategorizationNoteFieldFactoryTests(opencatBusinessConnectorTest);
         buildRecordTests(opencatBusinessConnectorTest);
-//        getValidateSchemasTests(opencatBusinessConnectorTest);
-//        sortRecordTests(opencatBusinessConnectorTest);
-//        preprocessTests(opencatBusinessConnectorTest);
-//        metacompassTests(opencatBusinessConnectorTest);
+        getValidateSchemasTests(opencatBusinessConnectorTest);
+        sortRecordTests(opencatBusinessConnectorTest);
+        preprocessTests(opencatBusinessConnectorTest);
+        metacompassTests(opencatBusinessConnectorTest);
     }
 
     private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
@@ -65,7 +65,7 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
     }
 
     private static void buildRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
-        //connectorTest.buildRecordWithRecord();
+        connectorTest.buildRecordWithRecord();
         connectorTest.buildRecordWithoutRecord();
     }
 
