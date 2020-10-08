@@ -15,17 +15,21 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
 
     public static void main(String[] args) throws Exception {
         OpencatBusinessConnectorTest.connector = new OpencatBusinessConnector(
-                OpencatBusinessConnectorTest.CLIENT, "http://localhost:8080");
+                OpencatBusinessConnectorTest.CLIENT, "http://localhost:8081");
         final OpencatBusinessConnectorTest opencatBusinessConnectorTest = new OpencatBusinessConnectorTest();
 
-        validateRecordTests(opencatBusinessConnectorTest);
-        checkTemplateTests(opencatBusinessConnectorTest);
-        checkTemplateBuildTests(opencatBusinessConnectorTest);
-        doubleRecordFrontendTests(opencatBusinessConnectorTest);
-        getValidateSchemasTests(opencatBusinessConnectorTest);
-        sortRecordTests(opencatBusinessConnectorTest);
-        preprocessTests(opencatBusinessConnectorTest);
-        metacompassTests(opencatBusinessConnectorTest);
+//        validateRecordTests(opencatBusinessConnectorTest);
+//        checkTemplateTests(opencatBusinessConnectorTest);
+//        checkTemplateBuildTests(opencatBusinessConnectorTest);
+//        doubleRecordFrontendTests(opencatBusinessConnectorTest);
+        //checkDoubleRecord(opencatBusinessConnectorTest);
+        //doRecategorizationThingsTests(opencatBusinessConnectorTest);
+        //recategorizationNoteFieldFactoryTests(opencatBusinessConnectorTest);
+        buildRecordTests(opencatBusinessConnectorTest);
+//        getValidateSchemasTests(opencatBusinessConnectorTest);
+//        sortRecordTests(opencatBusinessConnectorTest);
+//        preprocessTests(opencatBusinessConnectorTest);
+//        metacompassTests(opencatBusinessConnectorTest);
     }
 
     private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
@@ -46,6 +50,23 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
     private static void doubleRecordFrontendTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
         connectorTest.checkDoubleRecordFrontend_ok();
         connectorTest.checkDoubleRecordFrontend_fail();
+    }
+
+    private static void checkDoubleRecord(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.checkDoubleRecord();
+    }
+
+    private static void recategorizationNoteFieldFactoryTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.recategorizationNoteFieldFactory();
+    }
+
+    private static void doRecategorizationThingsTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        connectorTest.doRecatogorizationThings();
+    }
+
+    private static void buildRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+        //connectorTest.buildRecordWithRecord();
+        connectorTest.buildRecordWithoutRecord();
     }
 
     private static void getValidateSchemasTests(OpencatBusinessConnectorTest connectorTest) throws Exception {

@@ -1,7 +1,9 @@
 package dk.dbc.opencat.connector;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import dk.dbc.common.records.MarcField;
 import dk.dbc.common.records.MarcRecord;
+import dk.dbc.common.records.MarcSubField;
 import dk.dbc.common.records.utils.RecordContentTransformer;
 import dk.dbc.httpclient.HttpClient;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendDTO;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.client.Client;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +28,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OpencatBusinessConnectorTest {
@@ -385,6 +389,690 @@ public class OpencatBusinessConnectorTest {
         final DoubleRecordFrontendStatusDTO actual = connector.checkDoubleRecordFrontend(marcRecord);
 
         assertThat("Check status for checkDoubleRecordFrontend", actual, is(expectedStatus));
+    }
+
+    @Test
+    void checkDoubleRecord() throws Exception {
+        final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n" +
+                "<record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">50938409</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20191218013539</subfield>\n" +
+                "        <subfield code=\"d\">20140131</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">n</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"008\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2014</subfield>\n" +
+                "        <subfield code=\"b\">dk</subfield>\n" +
+                "        <subfield code=\"d\">2</subfield>\n" +
+                "        <subfield code=\"d\">å</subfield>\n" +
+                "        <subfield code=\"d\">x</subfield>\n" +
+                "        <subfield code=\"l\">dan</subfield>\n" +
+                "        <subfield code=\"o\">b</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"009\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"021\">\n" +
+                "        <subfield code=\"c\">ib.</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"032\">\n" +
+                "        <subfield code=\"a\">DBF201409</subfield>\n" +
+                "        <subfield code=\"x\">BKM201409</subfield>\n" +
+                "        <subfield code=\"x\">ACC201405</subfield>\n" +
+                "        <subfield code=\"x\">DAT991605</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"038\">\n" +
+                "        <subfield code=\"a\">bi</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"041\">\n" +
+                "        <subfield code=\"a\">dan</subfield>\n" +
+                "        <subfield code=\"c\">nor</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"100\">\n" +
+                "        <subfield code=\"5\">870979</subfield>\n" +
+                "        <subfield code=\"6\">69208045</subfield>\n" +
+                "        <subfield code=\"4\">aut</subfield>\n" +
+                "        <subfield code=\"4\">art</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"241\">\n" +
+                "        <subfield code=\"a\">Odd er et egg</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">Ib er et æggehoved</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"250\">\n" +
+                "        <subfield code=\"a\">1. udgave</subfield>\n" +
+                "        <subfield code=\"b\">÷</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"260\">\n" +
+                "        <subfield code=\"&amp;\">1</subfield>\n" +
+                "        <subfield code=\"a\">Hedehusene</subfield>\n" +
+                "        <subfield code=\"b\">Torgard</subfield>\n" +
+                "        <subfield code=\"c\">2014</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"300\">\n" +
+                "        <subfield code=\"a\">[36] sider</subfield>\n" +
+                "        <subfield code=\"b\">alle ill. i farver</subfield>\n" +
+                "        <subfield code=\"c\">28 cm</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"504\">\n" +
+                "        <subfield code=\"&amp;\">1</subfield>\n" +
+                "        <subfield code=\"a\">Billedbog. Hver morgen pakker Ib sit hoved ind i håndklæder og en tehætte. Hans hoved er nemlig et æg, og han skal hele tiden passe på, at det ikke går i stykker. Men så møder han Sif. Hun passer ikke på noget</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"521\">\n" +
+                "        <subfield code=\"&amp;\">REX</subfield>\n" +
+                "        <subfield code=\"b\">1. oplag</subfield>\n" +
+                "        <subfield code=\"c\">2014</subfield>\n" +
+                "        <subfield code=\"k\">Arcorounborg</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"n\">85</subfield>\n" +
+                "        <subfield code=\"z\">296</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"o\">sk</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">alene</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">ensomhed</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">venskab</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">kærlighed</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">tapperhed</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"s\">mod</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"u\">for 4 år</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"u\">for 5 år</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"u\">for 6 år</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"u\">for 7 år</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"720\">\n" +
+                "        <subfield code=\"o\">Hugin Eide</subfield>\n" +
+                "        <subfield code=\"4\">trl</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"990\">\n" +
+                "        <subfield code=\"o\">201409</subfield>\n" +
+                "        <subfield code=\"b\">l</subfield>\n" +
+                "        <subfield code=\"b\">b</subfield>\n" +
+                "        <subfield code=\"b\">s</subfield>\n" +
+                "        <subfield code=\"u\">nt</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"996\">\n" +
+                "        <subfield code=\"a\">DBC</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>\n";
+
+        final MarcRecord marcRecord = RecordContentTransformer.decodeRecord(recordString.getBytes());
+
+        assertDoesNotThrow(() -> connector.checkDoubleRecord(marcRecord));
+    }
+
+    @Test
+    void recategorizationNoteFieldFactory() throws Exception {
+        final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20070726122101</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"002\">\n" +
+                "        <subfield code=\"b\">721700</subfield>\n" +
+                "        <subfield code=\"c\">95487653</subfield>\n" +
+                "        <subfield code=\"x\">72170095487653</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"008\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"009\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"021\">\n" +
+                "        <subfield code=\"a\">1-56971-998-5</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"100\">\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"260\">\n" +
+                "        <subfield code=\"a\">Milwaukie</subfield>\n" +
+                "        <subfield code=\"b\">Dark Horse</subfield>\n" +
+                "        <subfield code=\"c\">2003</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"300\">\n" +
+                "        <subfield code=\"a\">1 bind</subfield>\n" +
+                "        <subfield code=\"b\">ill. i farver</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"440\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"a\">The ¤Goon</subfield>\n" +
+                "        <subfield code=\"V\">1</subfield>\n" +
+                "        <subfield code=\"v\">Volume 1</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"505\">\n" +
+                "        <subfield code=\"a\">Tegneserie</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"520\">\n" +
+                "        <subfield code=\"a\">Tidligere udgivet som enkelthæfter</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"745\">\n" +
+                "        <subfield code=\"a\">Nothing but misery</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"996\">\n" +
+                "        <subfield code=\"a\">710100</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>\n";
+
+        final MarcRecord record = RecordContentTransformer.decodeRecord(recordString.getBytes());
+
+        final MarcField expected = new MarcField();
+        expected.setName("512");
+        expected.setIndicator("00");
+        expected.setSubfields(Arrays.asList(
+                new MarcSubField("i", "Materialet er opstillet under"),
+                new MarcSubField("d", "Powell, Eric"),
+                new MarcSubField("t", "The ¤Goon, nothin' but misery"),
+                new MarcSubField("b", "# (DK5 83.8), materialekoder [a (xx)]. Postens opstilling ændret på grund af omkatalogisering")));
+
+        final MarcField actual = connector.recategorizationNoteFieldFactory(record);
+
+        assertThat("perform recategorizationNoteFieldFactory", actual, is(expected));
+    }
+
+    @Test
+    void buildRecordWithRecord() throws Exception {
+        final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20070726122101</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"002\">\n" +
+                "        <subfield code=\"b\">721700</subfield>\n" +
+                "        <subfield code=\"c\">95487653</subfield>\n" +
+                "        <subfield code=\"x\">72170095487653</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"008\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"009\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"021\">\n" +
+                "        <subfield code=\"a\">1-56971-998-5</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"100\">\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"260\">\n" +
+                "        <subfield code=\"a\">Milwaukie</subfield>\n" +
+                "        <subfield code=\"b\">Dark Horse</subfield>\n" +
+                "        <subfield code=\"c\">2003</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"300\">\n" +
+                "        <subfield code=\"a\">1 bind</subfield>\n" +
+                "        <subfield code=\"b\">ill. i farver</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"440\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"a\">The ¤Goon</subfield>\n" +
+                "        <subfield code=\"V\">1</subfield>\n" +
+                "        <subfield code=\"v\">Volume 1</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"505\">\n" +
+                "        <subfield code=\"a\">Tegneserie</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"520\">\n" +
+                "        <subfield code=\"a\">Tidligere udgivet som enkelthæfter</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"745\">\n" +
+                "        <subfield code=\"a\">Nothing but misery</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"996\">\n" +
+                "        <subfield code=\"a\">710100</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>\n";
+
+        final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
+                "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">130566251</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20070726122101</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"002\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"b\">721700</subfield>\n" +
+                "        <subfield code=\"c\">95487653</subfield>\n" +
+                "        <subfield code=\"x\">72170095487653</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"004\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"008\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"009\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"021\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">1-56971-998-5</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"100\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"245\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"260\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">Milwaukie</subfield>\n" +
+                "        <subfield code=\"b\">Dark Horse</subfield>\n" +
+                "        <subfield code=\"c\">2003</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"300\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">1 bind</subfield>\n" +
+                "        <subfield code=\"b\">ill. i farver</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"440\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"0\"></subfield>\n" +
+                "        <subfield code=\"a\">The ¤Goon</subfield>\n" +
+                "        <subfield code=\"v\">Volume 1</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"505\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">Tegneserie</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"520\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">Tidligere udgivet som enkelthæfter</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"652\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"745\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">Nothing but misery</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"996\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">710100</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>";
+
+        final MarcRecord record = RecordContentTransformer.decodeRecord(recordString.getBytes());
+        final MarcRecord expectedRecord = RecordContentTransformer.decodeRecord(expectedRecordString.getBytes());
+
+        final MarcRecord actualRecord = connector.buildRecord("dbcsingle", record);
+
+        assertThat("perform buildRecord with record", actualRecord, is(expectedRecord));
+    }
+
+    @Test
+    void buildRecordWithoutRecord() throws Exception {
+        final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
+                "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">130566294</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\"></subfield>\n" +
+                "        <subfield code=\"d\"></subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"004\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"r\"></subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"008\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"v\"></subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"009\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\"></subfield>\n" +
+                "        <subfield code=\"g\"></subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"245\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\"></subfield>\n" +
+                "    </datafield>\n" +
+                "</record>";
+
+        final MarcRecord expectedRecord = RecordContentTransformer.decodeRecord(expectedRecordString.getBytes());
+
+        final MarcRecord actualRecord = connector.buildRecord("dbcsingle");
+
+        assertThat("perform buildRecord with record", actualRecord, is(expectedRecord));
+    }
+
+    @Test
+    void doRecatogorizationThings() throws Exception {
+        final String updateRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20200602094545</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"002\">\n" +
+                "        <subfield code=\"b\">721700</subfield>\n" +
+                "        <subfield code=\"c\">95487653</subfield>\n" +
+                "        <subfield code=\"x\">72170095487653</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"008\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"009\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"021\">\n" +
+                "        <subfield code=\"a\">1-56971-998-5</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"038\">\n" +
+                "        <subfield code=\"a\">te</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"100\">\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"260\">\n" +
+                "        <subfield code=\"a\">Milwaukie</subfield>\n" +
+                "        <subfield code=\"b\">Dark Horse</subfield>\n" +
+                "        <subfield code=\"c\">2003</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"300\">\n" +
+                "        <subfield code=\"a\">1 bind</subfield>\n" +
+                "        <subfield code=\"b\">ill. i farver</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"440\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"a\">The ¤Goon</subfield>\n" +
+                "        <subfield code=\"V\">1</subfield>\n" +
+                "        <subfield code=\"v\">Volume 1</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"505\">\n" +
+                "        <subfield code=\"a\">Tegneserie</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"520\">\n" +
+                "        <subfield code=\"a\">Tidligere udgivet som enkelthæfter</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"745\">\n" +
+                "        <subfield code=\"a\">Nothing but misery</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"996\">\n" +
+                "        <subfield code=\"a\">710100</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>";
+
+        final String currentRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">870970</subfield>\n" +
+                "        <subfield code=\"c\">20070726122101</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"002\">\n" +
+                "        <subfield code=\"b\">721700</subfield>\n" +
+                "        <subfield code=\"c\">95487653</subfield>\n" +
+                "        <subfield code=\"x\">72170095487653</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"008\">\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"009\">\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"021\">\n" +
+                "        <subfield code=\"a\">1-56971-998-5</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"100\">\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"260\">\n" +
+                "        <subfield code=\"a\">Milwaukie</subfield>\n" +
+                "        <subfield code=\"b\">Dark Horse</subfield>\n" +
+                "        <subfield code=\"c\">2003</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"300\">\n" +
+                "        <subfield code=\"a\">1 bind</subfield>\n" +
+                "        <subfield code=\"b\">ill. i farver</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"440\">\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"a\">The ¤Goon</subfield>\n" +
+                "        <subfield code=\"V\">1</subfield>\n" +
+                "        <subfield code=\"v\">Volume 1</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"505\">\n" +
+                "        <subfield code=\"a\">Tegneserie</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"520\">\n" +
+                "        <subfield code=\"a\">Tidligere udgivet som enkelthæfter</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"745\">\n" +
+                "        <subfield code=\"a\">Nothing but misery</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"996\">\n" +
+                "        <subfield code=\"a\">710100</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>\n";
+
+        final String newRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
+                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">717500</subfield>\n" +
+                "        <subfield code=\"c\">20200602094548</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e\\n008 00</subfield>\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0\\n009 00</subfield>\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"038\">\n" +
+                "        <subfield code=\"a\">te\\n100 00</subfield>\n" +
+                "        <subfield code=\"0\"/>\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"245\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"652\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield ind1=\"0\" ind2=\"0\" tag=\"y08\">\n" +
+                "        <subfield code=\"a\">UPDATE opstillingsændring\\n</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>";
+
+        final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
+                "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">43645676</subfield>\n" +
+                "        <subfield code=\"b\">717500</subfield>\n" +
+                "        <subfield code=\"c\">20200602094548</subfield>\n" +
+                "        <subfield code=\"d\">20070726</subfield>\n" +
+                "        <subfield code=\"f\">a</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"004\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"r\">c</subfield>\n" +
+                "        <subfield code=\"a\">e\\n008 00</subfield>\n" +
+                "        <subfield code=\"t\">m</subfield>\n" +
+                "        <subfield code=\"u\">f</subfield>\n" +
+                "        <subfield code=\"a\">2003</subfield>\n" +
+                "        <subfield code=\"b\">us</subfield>\n" +
+                "        <subfield code=\"l\">eng</subfield>\n" +
+                "        <subfield code=\"v\">0\\n009 00</subfield>\n" +
+                "        <subfield code=\"a\">a</subfield>\n" +
+                "        <subfield code=\"g\">xx</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"038\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">te\\n100 00</subfield>\n" +
+                "        <subfield code=\"0\"></subfield>\n" +
+                "        <subfield code=\"a\">Powell</subfield>\n" +
+                "        <subfield code=\"h\">Eric</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"245\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">The ¤Goon, nothin' but misery</subfield>\n" +
+                "        <subfield code=\"e\">by Eric Powell</subfield>\n" +
+                "        <subfield code=\"f\">colors by Eric and Robin Powell</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"652\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"m\">83.8</subfield>\n" +
+                "    </datafield>\n" +
+                "    <datafield tag=\"y08\" ind1=\"0\" ind2=\"0\">\n" +
+                "        <subfield code=\"a\">UPDATE opstillingsændring\\n</subfield>\n" +
+                "    </datafield>\n" +
+                "</record>";
+
+        final MarcRecord updateRecord = RecordContentTransformer.decodeRecord(updateRecordString.getBytes());
+        final MarcRecord newRecord = RecordContentTransformer.decodeRecord(newRecordString.getBytes());
+        final MarcRecord currentRecord = RecordContentTransformer.decodeRecord(currentRecordString.getBytes());
+        final MarcRecord expectedRecord = RecordContentTransformer.decodeRecord(expectedRecordString.getBytes());
+
+        final MarcRecord actualRecord = connector.doRecategorizationThings(currentRecord, updateRecord, newRecord);
+
+        assertThat("Perform doRecategorizationThings", actualRecord, is(expectedRecord));
     }
 
     @Test
@@ -1045,5 +1733,6 @@ public class OpencatBusinessConnectorTest {
 
         assertThat(thrown.getMessage(), is("Posten 90004158:870970 findes ikke eller er slettet"));
     }
+
 
 }
