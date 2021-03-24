@@ -39,8 +39,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -76,13 +76,13 @@ public class OpencatBusinessConnector {
     private static final String PATH_BUILD_RECORD = "/api/v1/buildRecord";
     private static final String PATH_SORT_RECORD = "/api/v1/sortRecord";
     private static final String PATH_GET_VALIDATE_SCHEMAS = "/api/v1/getValidateSchemas";
-    private final static String PATH_PRE_PROCESS = "/api/v1/preprocess";
-    private final static String PATH_META_COMPASS = "/api/v1/metacompass";
+    private static final String PATH_PRE_PROCESS = "/api/v1/preprocess";
+    private static final String PATH_META_COMPASS = "/api/v1/metacompass";
 
-    private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
-            .retryOn(Collections.singletonList(ProcessingException.class))
-            .retryIf((Response response) -> response.getStatus() == 404)
-            .withDelay(10, TimeUnit.SECONDS)
+    private static final RetryPolicy<Response> RETRY_POLICY = new RetryPolicy<Response>()
+            .handle(ProcessingException.class)
+            .handleResultIf(response -> response.getStatus() == 404)
+            .withDelay(Duration.ofSeconds(10))
             .withMaxRetries(6);
 
     private final FailSafeHttpClient failSafeHttpClient;
@@ -198,7 +198,7 @@ public class OpencatBusinessConnector {
 
             final CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
 
-            return  responseDTO.isResult();
+            return responseDTO.isResult();
         } finally {
             logger.log("checkTemplateBuild took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
