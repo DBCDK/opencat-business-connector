@@ -790,7 +790,7 @@ public class OpencatBusinessConnectorTest {
         final MarcRecord record = RecordContentTransformer.decodeRecord(recordString.getBytes());
         final MarcRecord expectedRecord = RecordContentTransformer.decodeRecord(expectedRecordString.getBytes());
 
-        final MarcRecord actualRecord = connector.buildRecord("dbcsingle", record);
+        final MarcRecord actualRecord = connector.buildRecord("dbcsingle", record, null);
 
         assertThat("perform buildRecord with record", actualRecord, is(expectedRecord));
     }
@@ -825,7 +825,7 @@ public class OpencatBusinessConnectorTest {
 
         final MarcRecord expectedRecord = RecordContentTransformer.decodeRecord(expectedRecordString.getBytes());
 
-        final MarcRecord actualRecord = connector.buildRecord("dbcsingle");
+        final MarcRecord actualRecord = connector.buildRecord("dbcsingle", null, null);
 
         assertThat("perform buildRecord with record", actualRecord, is(expectedRecord));
     }

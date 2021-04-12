@@ -159,11 +159,19 @@ public class OpencatBusinessConnector {
     }
 
     public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        return validateRecord(schemaName, marcRecord, null);
+    }
+
+    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord, String trackingId) throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final ValidateRecordRequestDTO requestDTO = new ValidateRecordRequestDTO();
             requestDTO.setTemplateName(schemaName);
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
+
             final InputStream responseStream = sendPostRequestWithReturn(PATH_VALIDATE_RECORD, requestDTO, InputStream.class);
 
             return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), MessageEntryDTO[].class));
@@ -176,12 +184,22 @@ public class OpencatBusinessConnector {
     public boolean checkTemplate(String name,
                                  String groupId,
                                  String libraryType) throws OpencatBusinessConnectorException, JSONBException {
+        return checkTemplate(name, groupId, libraryType, null);
+    }
+
+    public boolean checkTemplate(String name,
+                                 String groupId,
+                                 String libraryType,
+                                 String trackingId) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final CheckTemplateRequestDTO requestDTO = new CheckTemplateRequestDTO();
             requestDTO.setName(name);
             requestDTO.setGroupId(groupId);
             requestDTO.setLibraryType(libraryType);
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             return sendPostRequestWithReturn(PATH_CHECK_TEMPLATE, requestDTO, Boolean.class);
         } finally {
@@ -191,10 +209,17 @@ public class OpencatBusinessConnector {
     }
 
     public boolean checkTemplateBuild(String name) throws OpencatBusinessConnectorException, JSONBException {
+        return checkTemplateBuild(name, null);
+    }
+
+    public boolean checkTemplateBuild(String name, String trackingId) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
-            CheckTemplateBuildRequestDTO requestDTO = new CheckTemplateBuildRequestDTO();
+            final CheckTemplateBuildRequestDTO requestDTO = new CheckTemplateBuildRequestDTO();
             requestDTO.setName(name);
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final CheckTemplateBuildResponseDTO responseDTO = sendPostRequestWithReturn(PATH_CHECK_TEMPLATE_BUILD, requestDTO, CheckTemplateBuildResponseDTO.class);
 
@@ -207,10 +232,18 @@ public class OpencatBusinessConnector {
 
     public DoubleRecordFrontendStatusDTO checkDoubleRecordFrontend(MarcRecord marcRecord)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        return checkDoubleRecordFrontend(marcRecord, null);
+    }
+
+    public DoubleRecordFrontendStatusDTO checkDoubleRecordFrontend(MarcRecord marcRecord, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             return sendPostRequestWithReturn(PATH_CHECK_DOUBLE_RECORD_FRONTEND, requestDTO, DoubleRecordFrontendStatusDTO.class);
         } finally {
@@ -221,10 +254,18 @@ public class OpencatBusinessConnector {
 
     public void checkDoubleRecord(MarcRecord marcRecord)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        checkDoubleRecord(marcRecord, null);
+    }
+
+    public void checkDoubleRecord(MarcRecord marcRecord, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             sendPostRequestWithoutReturn(PATH_CHECK_DOUBLE_RECORD, requestDTO);
         } finally {
@@ -237,12 +278,23 @@ public class OpencatBusinessConnector {
                                                MarcRecord updateRecord,
                                                MarcRecord newRecord)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        return doRecategorizationThings(currentRecord, updateRecord, newRecord, null);
+    }
+
+    public MarcRecord doRecategorizationThings(MarcRecord currentRecord,
+                                               MarcRecord updateRecord,
+                                               MarcRecord newRecord,
+                                               String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final DoRecategorizationThingsRequestDTO requestDTO = new DoRecategorizationThingsRequestDTO();
             requestDTO.setCurrentRecord(marcRecordToDTOString(currentRecord));
             requestDTO.setUpdateRecord(marcRecordToDTOString(updateRecord));
             requestDTO.setNewRecord(marcRecordToDTOString(newRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_DO_RECATEGORIZATION_THINGS, requestDTO, RecordResponseDTO.class);
 
@@ -255,10 +307,18 @@ public class OpencatBusinessConnector {
 
     public MarcField recategorizationNoteFieldFactory(MarcRecord marcRecord)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        return recategorizationNoteFieldFactory(marcRecord, null);
+    }
+
+    public MarcField recategorizationNoteFieldFactory(MarcRecord marcRecord, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
         } finally {
@@ -267,29 +327,18 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public MarcRecord buildRecord(String templateName)
-            throws OpencatBusinessConnectorException, JSONBException, UnsupportedEncodingException {
-        final Stopwatch stopwatch = new Stopwatch();
-        try {
-            final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
-            requestDTO.setTemplateName(templateName);
-
-            final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
-
-            return RecordContentTransformer.decodeRecord(recordResponseDTO.getRecord().getBytes());
-        } finally {
-            logger.log("buildRecord took {} milliseconds",
-                    stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
-        }
-    }
-
-    public MarcRecord buildRecord(String templateName, MarcRecord marcRecord)
+    public MarcRecord buildRecord(String templateName, MarcRecord marcRecord, String trackingId)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
             requestDTO.setTemplateName(templateName);
-            requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (marcRecord != null) {
+                requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            }
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_BUILD_RECORD, requestDTO, RecordResponseDTO.class);
 
@@ -302,11 +351,19 @@ public class OpencatBusinessConnector {
 
     public MarcRecord sortRecord(String templateProvider, MarcRecord marcRecord)
             throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+        return sortRecord(templateProvider, marcRecord, null);
+    }
+
+    public MarcRecord sortRecord(String templateProvider, MarcRecord marcRecord, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final SortRecordRequestDTO requestDTO = new SortRecordRequestDTO();
             requestDTO.setTemplateProvider(templateProvider);
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_SORT_RECORD, requestDTO, RecordResponseDTO.class);
 
@@ -319,11 +376,19 @@ public class OpencatBusinessConnector {
 
     public List<SchemaDTO> getValidateSchemas(String templateGroup, Set<String> allowedLibraryRules)
             throws OpencatBusinessConnectorException, JSONBException {
+        return getValidateSchemas(templateGroup, allowedLibraryRules, null);
+    }
+
+    public List<SchemaDTO> getValidateSchemas(String templateGroup, Set<String> allowedLibraryRules, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final GetValidateSchemasRequestDTO requestDTO = new GetValidateSchemasRequestDTO();
             requestDTO.setTemplateGroup(templateGroup);
             requestDTO.setAllowedLibraryRules(allowedLibraryRules);
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
             final InputStream responseStream = sendPostRequestWithReturn(PATH_GET_VALIDATE_SCHEMAS, requestDTO, InputStream.class);
 
             return Arrays.asList(jsonbContext.unmarshall(StringUtil.asString(responseStream), SchemaDTO[].class));
@@ -333,11 +398,20 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public MarcRecord preprocess(MarcRecord marcRecord) throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+    public MarcRecord preprocess(MarcRecord marcRecord)
+            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+        return preprocess(marcRecord, null);
+    }
+
+    public MarcRecord preprocess(MarcRecord marcRecord, String trackingId)
+            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_PRE_PROCESS, requestDTO, RecordResponseDTO.class);
 
@@ -348,11 +422,20 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public MarcRecord metacompass(MarcRecord marcRecord) throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+    public MarcRecord metacompass(MarcRecord marcRecord)
+            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+        return metacompass(marcRecord, null);
+    }
+
+    public MarcRecord metacompass(MarcRecord marcRecord, String trackingId)
+            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
             requestDTO.setRecord(marcRecordToDTOString(marcRecord));
+            if (trackingId != null) {
+                requestDTO.setTrackingId(trackingId);
+            }
 
             final RecordResponseDTO recordResponseDTO = sendPostRequestWithReturn(PATH_META_COMPASS, requestDTO, RecordResponseDTO.class);
 
