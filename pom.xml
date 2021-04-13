@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>opencat-business-connector</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Opencat Business Connector</name>
@@ -20,7 +20,7 @@
         <wiremock.version>2.26.3</wiremock.version>
         <buildnumber.maven.plugin.version>1.4</buildnumber.maven.plugin.version>
         <utils.lang.version>1.0-SNAPSHOT</utils.lang.version>
-        <dto.version>2.0-SNAPSHOT</dto.version>
+        <dto.version>2.1-SNAPSHOT</dto.version>
         <junit.platform.surefire.provider.version>1.1.0</junit.platform.surefire.provider.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.surefire.version>2.19.1</maven.surefire.version>
