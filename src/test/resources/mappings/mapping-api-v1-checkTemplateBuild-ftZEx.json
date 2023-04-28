@@ -1,22 +1,22 @@
 {
-  "id" : "b82710b9-783f-3ceb-9e46-4c8edb2d714e",
+  "id" : "6ae014f2-5a68-3b14-829c-bc5282d566c2",
   "request" : {
     "url" : "/api/v1/checkTemplateBuild",
     "method" : "POST",
     "bodyPatterns" : [ {
-      "equalToJson" : "{\"name\":\"julemand\"}",
+      "equalToJson" : "{\"name\":\"julemand\",\"trackingId\":null}",
       "ignoreArrayOrder" : true,
       "ignoreExtraElements" : true
     } ]
   },
   "response" : {
     "status" : 200,
-    "bodyFileName" : "body-api-v1-checkTemplateBuild-7KrVL.json",
+    "bodyFileName" : "body-api-v1-checkTemplateBuild-ftZEx.json",
     "headers" : {
       "Server" : "Payara Micro #badassfish",
       "Content-Type" : "application/json",
       "X-Frame-Options" : "SAMEORIGIN"
     }
   },
-  "uuid" : "b82710b9-783f-3ceb-9e46-4c8edb2d714e"
+  "uuid" : "6ae014f2-5a68-3b14-829c-bc5282d566c2"
 }

@@ -1,0 +1,22 @@
+{
+  "id" : "894dc3a2-c5c9-346a-90ea-e1dbf6a7edc4",
+  "request" : {
+    "url" : "/api/v1/validateRecord",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"templateName\":\"dbcautoritet\",\"record\":\"<?xml version='1.0' encoding='UTF-8'?>\\n<record xmlns='info:lc/xmlns/marcxchange-v1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd'><leader>00000n    2200000   4500</leader><datafield ind1='0' ind2='0' tag='001'><subfield code='a'>68693268</subfield><subfield code='b'>870979</subfield><subfield code='c'>20181108150323</subfield><subfield code='d'>20131129</subfield><subfield code='f'>a</subfield></datafield><datafield ind1='0' ind2='0' tag='004'><subfield code='r'>n</subfield><subfield code='a'>e</subfield><subfield code='x'>n</subfield></datafield><datafield ind1='0' ind2='0' tag='008'><subfield code='t'>h</subfield><subfield code='v'>9</subfield></datafield><datafield ind1='0' ind2='0' tag='025'><subfield code='a'>5237167</subfield><subfield code='2'>viaf</subfield><subfield code='&amp;'>VIAF</subfield></datafield><datafield ind1='0' ind2='0' tag='025'><subfield code='a'>0000000013134949</subfield><subfield code='2'>isni</subfield><subfield code='&amp;'>VIAF</subfield></datafield><datafield ind1='0' ind2='0' tag='040'><subfield code='a'>DBC</subfield><subfield code='b'>dan</subfield></datafield><datafield ind1='0' ind2='0' tag='043'><subfield code='c'>dk</subfield><subfield code='&amp;'>VIAF</subfield></datafield><datafield ind1='0' ind2='0' tag='100'><subfield code='a'>Meilby</subfield><subfield code='h'>Mogens</subfield></datafield><datafield ind1='0' ind2='0' tag='375'><subfield code='a'>1</subfield><subfield code='2'>iso5218</subfield><subfield code='&amp;'>VIAF</subfield></datafield></record>\",\"trackingId\":null}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-validateRecord-Mt9JQ.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "894dc3a2-c5c9-346a-90ea-e1dbf6a7edc4"
+}

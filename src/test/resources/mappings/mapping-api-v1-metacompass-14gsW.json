@@ -1,0 +1,22 @@
+{
+  "id" : "2ec64fc0-0da0-338b-8447-076faff5a420",
+  "request" : {
+    "url" : "/api/v1/metacompass",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"record\":\"<?xml version='1.0' encoding='UTF-8'?>\\n<record xmlns='info:lc/xmlns/marcxchange-v1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd'><leader>00000n    2200000   4500</leader><datafield ind1='0' ind2='0' tag='001'><subfield code='a'>51580761</subfield><subfield code='b'>870970</subfield><subfield code='c'>20150304180759</subfield><subfield code='d'>20150209</subfield><subfield code='f'>a</subfield></datafield><datafield ind1='0' ind2='0' tag='004'><subfield code='r'>n</subfield><subfield code='a'>e</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='&amp;'>LEKTOR</subfield><subfield code='e'>kvinder</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='e'>parforhold</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='e'>politiske forhold</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='&amp;'>LEKTOR</subfield><subfield code='i'>middelalderen</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='&amp;'>LEKTOR</subfield><subfield code='q'>Danmark</subfield><subfield code='g'>slægtsromaner</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='q'>Europa</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='r'>jeg-fortæller</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='&amp;'>OVRIG</subfield><subfield code='r'>skiftende synsvinkler</subfield></datafield><datafield ind1='0' ind2='0' tag='665'><subfield code='&amp;'>LEKTOR</subfield><subfield code='e'>døden</subfield></datafield><datafield ind1='0' ind2='0' tag='666'><subfield code='s'>kvinder</subfield></datafield></record>\",\"trackingId\":null}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-metacompass-14gsW.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "2ec64fc0-0da0-338b-8447-076faff5a420"
+}
