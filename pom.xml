@@ -140,6 +140,7 @@
             <groupId>dk.dbc</groupId>
             <artifactId>common-records</artifactId>
             <version>2.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -162,12 +163,26 @@
             <groupId>dk.dbc</groupId>
             <artifactId>dbc-commons-marc</artifactId>
             <version>2.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${jdk.target.version}</source>
+                    <target>${jdk.target.version}</target>
+                    <testSource>${jdk.target.version}</testSource>
+                    <testTarget>${jdk.target.version}</testTarget>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -187,16 +202,6 @@
                         <version>${junit5.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.8</version>
-                <configuration>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <minimumTokens>100</minimumTokens>
-                    <targetJdk>${jdk.target.version}</targetJdk>
-                </configuration>
             </plugin>
         </plugins>
     </build>
