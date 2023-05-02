@@ -9,11 +9,11 @@ import java.util.List;
     This class is used for translating the json send from the javascript to DataField object.
     The class can't be serialized directly because the properties have slightly different names.
  */
-public class FakeDataField {
+public class WrapperDataField {
 
     private String name;
     private String indicator;
-    private List<FakeSubField> subfields;
+    private List<WrapperSubField> subfields;
 
     public String getName() {
         return name;
@@ -31,18 +31,18 @@ public class FakeDataField {
         this.indicator = indicators;
     }
 
-    public List<FakeSubField> getSubfields() {
+    public List<WrapperSubField> getSubfields() {
         return subfields;
     }
 
-    public void setSubfields(List<FakeSubField> subfields) {
+    public void setSubfields(List<WrapperSubField> subfields) {
         this.subfields = subfields;
     }
 
     public DataField toDataField() {
         final DataField dataField = new DataField(name, indicator);
-        for (FakeSubField fakeSubField : subfields) {
-            dataField.addSubField(new SubField(fakeSubField.getName().charAt(0), fakeSubField.getValue()));
+        for (WrapperSubField wrapperSubField : subfields) {
+            dataField.addSubField(new SubField(wrapperSubField.getName().charAt(0), wrapperSubField.getValue()));
         }
 
         return dataField;

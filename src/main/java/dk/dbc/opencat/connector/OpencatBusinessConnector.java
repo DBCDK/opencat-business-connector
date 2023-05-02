@@ -314,7 +314,7 @@ public class OpencatBusinessConnector {
                 requestDTO.setTrackingId(trackingId);
             }
 
-            return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, FakeDataField.class).toDataField();
+            return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, WrapperDataField.class).toDataField();
         } finally {
             logger.log("recategorizationNoteFieldFactory took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));

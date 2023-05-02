@@ -4,7 +4,7 @@ package dk.dbc.opencat.connector;
     This class is used for translating the json send from the javascript to SubField object.
     The class can't be serialized directly because the properties have slightly different names.
  */
-public class FakeSubField {
+public class WrapperSubField {
 
     private String name;
     private String value;
