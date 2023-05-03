@@ -1,13 +1,6 @@
-/*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
- * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
- */
-
 package dk.dbc.opencat.connector;
 
-import dk.dbc.common.records.MarcField;
-import dk.dbc.common.records.MarcRecord;
-import dk.dbc.common.records.utils.RecordContentTransformer;
+import dk.dbc.common.records.RecordContentTransformer;
 import dk.dbc.dataio.commons.utils.lang.StringUtil;
 import dk.dbc.httpclient.FailSafeHttpClient;
 import dk.dbc.httpclient.HttpPost;
@@ -15,6 +8,9 @@ import dk.dbc.httpclient.PathBuilder;
 import dk.dbc.invariant.InvariantUtil;
 import dk.dbc.jsonb.JSONBContext;
 import dk.dbc.jsonb.JSONBException;
+import dk.dbc.marc.binding.DataField;
+import dk.dbc.marc.binding.MarcRecord;
+import dk.dbc.marc.reader.MarcReaderException;
 import dk.dbc.opencatbusiness.dto.BuildRecordRequestDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateBuildRequestDTO;
 import dk.dbc.opencatbusiness.dto.CheckTemplateBuildResponseDTO;
@@ -36,9 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * This class is thread safe, as long as the given web resources client remains thread safe.
  * </p>
  * <p>
- * Service home: https://github.com/DBCDK/opencat-business
+ * Service home: <a href="https://github.com/DBCDK/opencat-business">https://github.com/DBCDK/opencat-business</a>
  * </p>
  */
 public class OpencatBusinessConnector {
@@ -158,11 +152,11 @@ public class OpencatBusinessConnector {
         failSafeHttpClient.getClient().close();
     }
 
-    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord) throws OpencatBusinessConnectorException, JSONBException {
         return validateRecord(schemaName, marcRecord, null);
     }
 
-    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord, String trackingId) throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+    public List<MessageEntryDTO> validateRecord(String schemaName, MarcRecord marcRecord, String trackingId) throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final ValidateRecordRequestDTO requestDTO = new ValidateRecordRequestDTO();
@@ -231,12 +225,12 @@ public class OpencatBusinessConnector {
     }
 
     public DoubleRecordFrontendStatusDTO checkDoubleRecordFrontend(MarcRecord marcRecord)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException {
         return checkDoubleRecordFrontend(marcRecord, null);
     }
 
     public DoubleRecordFrontendStatusDTO checkDoubleRecordFrontend(MarcRecord marcRecord, String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
@@ -253,12 +247,12 @@ public class OpencatBusinessConnector {
     }
 
     public void checkDoubleRecord(MarcRecord marcRecord)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException {
         checkDoubleRecord(marcRecord, null);
     }
 
     public void checkDoubleRecord(MarcRecord marcRecord, String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
@@ -277,7 +271,7 @@ public class OpencatBusinessConnector {
     public MarcRecord doRecategorizationThings(MarcRecord currentRecord,
                                                MarcRecord updateRecord,
                                                MarcRecord newRecord)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException, MarcReaderException {
         return doRecategorizationThings(currentRecord, updateRecord, newRecord, null);
     }
 
@@ -285,7 +279,7 @@ public class OpencatBusinessConnector {
                                                MarcRecord updateRecord,
                                                MarcRecord newRecord,
                                                String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException, MarcReaderException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final DoRecategorizationThingsRequestDTO requestDTO = new DoRecategorizationThingsRequestDTO();
@@ -305,13 +299,13 @@ public class OpencatBusinessConnector {
         }
     }
 
-    public MarcField recategorizationNoteFieldFactory(MarcRecord marcRecord)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+    public DataField recategorizationNoteFieldFactory(MarcRecord marcRecord)
+            throws OpencatBusinessConnectorException, JSONBException {
         return recategorizationNoteFieldFactory(marcRecord, null);
     }
 
-    public MarcField recategorizationNoteFieldFactory(MarcRecord marcRecord, String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+    public DataField recategorizationNoteFieldFactory(MarcRecord marcRecord, String trackingId)
+            throws OpencatBusinessConnectorException, JSONBException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
@@ -320,7 +314,7 @@ public class OpencatBusinessConnector {
                 requestDTO.setTrackingId(trackingId);
             }
 
-            return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, MarcField.class);
+            return sendPostRequestWithReturn(PATH_RECATEGORIZATION_NOTE_FIELD_FACTORY, requestDTO, WrapperDataField.class).toDataField();
         } finally {
             logger.log("recategorizationNoteFieldFactory took {} milliseconds",
                     stopwatch.getElapsedTime(TimeUnit.MILLISECONDS));
@@ -328,7 +322,7 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord buildRecord(String templateName, MarcRecord marcRecord, String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException, MarcReaderException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final BuildRecordRequestDTO requestDTO = new BuildRecordRequestDTO();
@@ -350,12 +344,12 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord sortRecord(String templateProvider, MarcRecord marcRecord)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException, MarcReaderException {
         return sortRecord(templateProvider, marcRecord, null);
     }
 
     public MarcRecord sortRecord(String templateProvider, MarcRecord marcRecord, String trackingId)
-            throws OpencatBusinessConnectorException, JSONBException, JAXBException, UnsupportedEncodingException {
+            throws OpencatBusinessConnectorException, JSONBException, MarcReaderException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final SortRecordRequestDTO requestDTO = new SortRecordRequestDTO();
@@ -399,12 +393,12 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord preprocess(MarcRecord marcRecord)
-            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+            throws JSONBException, OpencatBusinessConnectorException, MarcReaderException {
         return preprocess(marcRecord, null);
     }
 
     public MarcRecord preprocess(MarcRecord marcRecord, String trackingId)
-            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+            throws JSONBException, OpencatBusinessConnectorException, MarcReaderException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
@@ -423,12 +417,12 @@ public class OpencatBusinessConnector {
     }
 
     public MarcRecord metacompass(MarcRecord marcRecord)
-            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+            throws JSONBException, OpencatBusinessConnectorException, MarcReaderException {
         return metacompass(marcRecord, null);
     }
 
     public MarcRecord metacompass(MarcRecord marcRecord, String trackingId)
-            throws UnsupportedEncodingException, JAXBException, JSONBException, OpencatBusinessConnectorException {
+            throws JSONBException, OpencatBusinessConnectorException, MarcReaderException {
         final Stopwatch stopwatch = new Stopwatch();
         try {
             final RecordRequestDTO requestDTO = new RecordRequestDTO();
@@ -498,7 +492,7 @@ public class OpencatBusinessConnector {
         }
     }
 
-    private String marcRecordToDTOString(MarcRecord marcRecord) throws JAXBException, UnsupportedEncodingException {
+    private String marcRecordToDTOString(MarcRecord marcRecord) {
         if (marcRecord == null) {
             return null;
         } else {

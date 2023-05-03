@@ -1,11 +1,11 @@
 package dk.dbc.opencat.connector;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import dk.dbc.common.records.MarcField;
-import dk.dbc.common.records.MarcRecord;
-import dk.dbc.common.records.MarcSubField;
-import dk.dbc.common.records.utils.RecordContentTransformer;
+import dk.dbc.common.records.RecordContentTransformer;
 import dk.dbc.httpclient.HttpClient;
+import dk.dbc.marc.binding.DataField;
+import dk.dbc.marc.binding.MarcRecord;
+import dk.dbc.marc.binding.SubField;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendDTO;
 import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.client.Client;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class OpencatBusinessConnectorTest {
+class OpencatBusinessConnectorTest {
     private static WireMockServer wireMockServer;
     private static String wireMockHost;
     static OpencatBusinessConnector connector;
@@ -68,7 +67,6 @@ public class OpencatBusinessConnectorTest {
                 "        <subfield code=\"c\">20181108150323</subfield>\n" +
                 "        <subfield code=\"d\">20131129</subfield>\n" +
                 "        <subfield code=\"f\">a</subfield>\n" +
-                "        <subfield code=\"t\">faust</subfield>\n" +
                 "    </datafield>\n" +
                 "    <datafield tag=\"004\" ind1=\"0\" ind2=\"0\">\n" +
                 "        <subfield code=\"r\">n</subfield>\n" +
@@ -123,7 +121,6 @@ public class OpencatBusinessConnectorTest {
                 "        <subfield code=\"c\">20181108150323</subfield>\n" +
                 "        <subfield code=\"d\">20131129</subfield>\n" +
                 "        <subfield code=\"f\">a</subfield>\n" +
-                "        <subfield code=\"t\">faust</subfield>\n" +
                 "    </datafield>\n" +
                 "    <datafield tag=\"004\" ind1=\"0\" ind2=\"0\">\n" +
                 "        <subfield code=\"r\">n</subfield>\n" +
@@ -547,7 +544,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void recategorizationNoteFieldFactory() throws Exception {
         final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -622,16 +619,13 @@ public class OpencatBusinessConnectorTest {
 
         final MarcRecord record = RecordContentTransformer.decodeRecord(recordString.getBytes());
 
-        final MarcField expected = new MarcField();
-        expected.setName("512");
-        expected.setIndicator("00");
-        expected.setSubfields(Arrays.asList(
-                new MarcSubField("i", "Materialet er opstillet under"),
-                new MarcSubField("d", "Powell, Eric"),
-                new MarcSubField("t", "The ¤Goon, nothin' but misery"),
-                new MarcSubField("b", "# (DK5 83.8), materialekoder [a (xx)]. Postens opstilling ændret på grund af omkatalogisering")));
+        final DataField expected = new DataField("512", "00")
+                .addSubField(new SubField('i', "Materialet er opstillet under"))
+                .addSubField(new SubField('d', "Powell, Eric"))
+                .addSubField(new SubField('t', "The ¤Goon, nothin' but misery"))
+                .addSubField(new SubField('b', "# (DK5 83.8), materialekoder [a (xx)]. Postens opstilling ændret på grund af omkatalogisering"));
 
-        final MarcField actual = connector.recategorizationNoteFieldFactory(record);
+        final DataField actual = connector.recategorizationNoteFieldFactory(record);
 
         assertThat("perform recategorizationNoteFieldFactory", actual, is(expected));
     }
@@ -639,7 +633,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void buildRecordWithRecord() throws Exception {
         final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -715,9 +709,9 @@ public class OpencatBusinessConnectorTest {
         final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
                 "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
-                "        <subfield code=\"a\">130566251</subfield>\n" +
+                "        <subfield code=\"a\">136012088</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
                 "        <subfield code=\"c\">20070726122101</subfield>\n" +
                 "        <subfield code=\"d\">20070726</subfield>\n" +
@@ -800,9 +794,9 @@ public class OpencatBusinessConnectorTest {
         final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
                 "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
-                "        <subfield code=\"a\">130566294</subfield>\n" +
+                "        <subfield code=\"a\">136012142</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
                 "        <subfield code=\"c\"></subfield>\n" +
                 "        <subfield code=\"d\"></subfield>\n" +
@@ -833,7 +827,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void doRecatogorizationThings() throws Exception {
         final String updateRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -910,7 +904,7 @@ public class OpencatBusinessConnectorTest {
                 "</record>";
 
         final String currentRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -984,7 +978,7 @@ public class OpencatBusinessConnectorTest {
                 "</record>\n";
 
         final String newRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">717500</subfield>\n" +
@@ -1026,7 +1020,7 @@ public class OpencatBusinessConnectorTest {
         final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
                 "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-                "    <leader>00000n 2200000 4500</leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">717500</subfield>\n" +
@@ -1080,13 +1074,10 @@ public class OpencatBusinessConnectorTest {
         final List<SchemaDTO> actual = connector.getValidateSchemas("dbc", new HashSet<>());
         final List<SchemaDTO> expected = new ArrayList<>();
         expected.add(new SchemaDTO("allowall", ""));
-        expected.add(new SchemaDTO("BCIbog", "Skabelon til katalogisering af fysiske bøger - enkeltstående post."));
-        expected.add(new SchemaDTO("BCIbogbind", "Skabelon til katalogisering af flerbindsværk af fysiske bøger - bindpost."));
-        expected.add(new SchemaDTO("BCIboghoved", "Skabelon til katalogisering af flerbindsværk af fysiske bøger - hovedpost."));
-        expected.add(new SchemaDTO("dbclittolk", ""));
+        expected.add(new SchemaDTO("dbcglobal", "Skabelon til teknisk inplementering og modellering af RDA poster (danMarc3)"));
+        expected.add(new SchemaDTO("dbcglobalaut", "Skabelon til teknisk inplementering og modellering af RDA entiteter (danMarc3)"));
         expected.add(new SchemaDTO("delete", "Skabelon til sletteposter - alle post- og materialetyper."));
         expected.add(new SchemaDTO("metakompas", "Skabelon til indsendelse af metakompasdata til læsekompasset."));
-        expected.add(new SchemaDTO("delete", "Skabelon til sletteposter - alle post- og materialetyper."));
         expected.add(new SchemaDTO("ffu", "Skabelon til optrettelse af ffu-singlepost - alle materialetyper."));
         expected.add(new SchemaDTO("ffuartikel", "Skabelon til optrettelse af ffu-artikelpost (periodicaartikel og artikel i bog"));
         expected.add(new SchemaDTO("ffubind", "Skabelon til optrettelse af ffu-bindpost - alle materialetyper."));
@@ -1101,7 +1092,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void sortRecord() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -1175,7 +1166,7 @@ public class OpencatBusinessConnectorTest {
                 "</record>\n";
 
         final String marcStringExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "    <leader>00000     22000000 4500 </leader>\n" +
+                "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">43645676</subfield>\n" +
                 "        <subfield code=\"b\">870970</subfield>\n" +
@@ -1259,7 +1250,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void preprocess() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "  <leader>00000     22000000 4500 </leader>\n" +
+                "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "    <subfield code=\"a\">5 279 335 1</subfield>\n" +
                 "    <subfield code=\"b\">870970</subfield>\n" +
@@ -1338,7 +1329,7 @@ public class OpencatBusinessConnectorTest {
                 "</record>\n";
 
         final String marcStringExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "  <leader>00000     22000000 4500 </leader>\n" +
+                "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "    <subfield code=\"a\">5 279 335 1</subfield>\n" +
                 "    <subfield code=\"b\">870970</subfield>\n" +
@@ -1394,11 +1385,9 @@ public class OpencatBusinessConnectorTest {
                 "    <subfield code=\"o\">idebøger</subfield>\n" +
                 "  </datafield>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
-                "    <subfield code=\"0\"/>\n" +
                 "    <subfield code=\"u\">for 9 år</subfield>\n" +
                 "  </datafield>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"666\">\n" +
-                "    <subfield code=\"0\"/>\n" +
                 "    <subfield code=\"u\">for 10 år</subfield>\n" +
                 "  </datafield>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"720\">\n" +
@@ -1432,14 +1421,13 @@ public class OpencatBusinessConnectorTest {
     @Test
     void metacompass() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "  <leader>00000     22000000 4500 </leader>\n" +
+                "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "    <subfield code=\"a\">51580761</subfield>\n" +
                 "    <subfield code=\"b\">870970</subfield>\n" +
                 "    <subfield code=\"c\">20150304180759</subfield>\n" +
                 "    <subfield code=\"d\">20150209</subfield>\n" +
                 "    <subfield code=\"f\">a</subfield>\n" +
-                "    <subfield code=\"t\">FAUST</subfield>\n" +
                 "  </datafield>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"004\">\n" +
                 "    <subfield code=\"r\">n</subfield>\n" +
@@ -1705,7 +1693,7 @@ public class OpencatBusinessConnectorTest {
     @Test
     void metacompass_ErrorCheck() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
-                "  <leader>00000     22000000 4500 </leader>\n" +
+                "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "    <subfield code=\"a\">90004158</subfield>\n" +
                 "    <subfield code=\"b\">870970</subfield>\n" +

@@ -1,22 +1,22 @@
 {
-  "id" : "a8921d91-1d0a-3e54-af2d-577bbc493465",
+  "id" : "c4eb79dd-a43c-3da7-a4a2-e087bd4a2e77",
   "request" : {
-    "url" : "/api/v1/getValidateSchemas",
+    "url" : "/api/v1/checkTemplate",
     "method" : "POST",
     "bodyPatterns" : [ {
-      "equalToJson" : "{\"templateGroup\":\"dbc\",\"allowedLibraryRules\":[]}",
+      "equalToJson" : "{\"name\":\"netlydbog\",\"groupId\":\"710100\",\"libraryType\":\"fbs\",\"trackingId\":null}",
       "ignoreArrayOrder" : true,
       "ignoreExtraElements" : true
     } ]
   },
   "response" : {
     "status" : 200,
-    "bodyFileName" : "body-api-v1-getValidateSchemas-pyCih.json",
+    "bodyFileName" : "body-api-v1-checkTemplate-xlBrP.json",
     "headers" : {
       "Server" : "Payara Micro #badassfish",
       "Content-Type" : "application/json",
       "X-Frame-Options" : "SAMEORIGIN"
     }
   },
-  "uuid" : "a8921d91-1d0a-3e54-af2d-577bbc493465"
+  "uuid" : "c4eb79dd-a43c-3da7-a4a2-e087bd4a2e77"
 }

@@ -1,0 +1,22 @@
+{
+  "id" : "80d1ac48-c55c-3801-844d-162cb65ac094",
+  "request" : {
+    "url" : "/api/v1/checkDoubleRecordFrontend",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"record\":\"<?xml version='1.0' encoding='UTF-8'?>\\n<record xmlns='info:lc/xmlns/marcxchange-v1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd'><datafield ind1='0' ind2='0' tag='001'><subfield code='a'>52958858</subfield><subfield code='b'>870970</subfield><subfield code='c'>20170616143600</subfield><subfield code='d'>20180628</subfield><subfield code='f'>a</subfield></datafield><datafield ind1='0' ind2='0' tag='021'><subfield code='e'>9782843090387</subfield></datafield></record>\",\"trackingId\":null}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-api-v1-checkDoubleRecordFrontend-z6eor.json",
+    "headers" : {
+      "Server" : "Payara Micro #badassfish",
+      "Content-Type" : "application/json",
+      "X-Frame-Options" : "SAMEORIGIN"
+    }
+  },
+  "uuid" : "80d1ac48-c55c-3801-844d-162cb65ac094"
+}
