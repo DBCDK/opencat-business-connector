@@ -1,6 +1,8 @@
 package dk.dbc.opencat.connector;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.common.SingleRootFileSource;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import dk.dbc.common.records.RecordContentTransformer;
 import dk.dbc.httpclient.HttpClient;
 import dk.dbc.marc.binding.DataField;
@@ -30,7 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class OpencatBusinessConnectorTest {
+class OpencatBusinessConnectorIT {
     private static WireMockServer wireMockServer;
     private static String wireMockHost;
     static OpencatBusinessConnector connector;
@@ -40,11 +42,14 @@ class OpencatBusinessConnectorTest {
 
     @BeforeAll
     static void startWireMockServer() {
-        wireMockServer = new WireMockServer(options().dynamicPort()
-                .dynamicHttpsPort());
+        WireMockConfiguration ww = options().dynamicPort();
+        wireMockServer = new WireMockServer(options().fileSource(new SingleRootFileSource("target/test-classes")).dynamicPort().dynamicHttpsPort());
         wireMockServer.start();
         wireMockHost = "http://localhost:" + wireMockServer.port();
         configureFor("localhost", wireMockServer.port());
+        System.out.println("WAKKA : " + wireMockServer.getStubMappings().size());
+        System.out.println("WAKKA : " + wireMockServer.getStubMappings().toString());
+        System.out.println("WAKKA : ");
     }
 
     @BeforeAll

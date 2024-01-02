@@ -14,9 +14,9 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
      */
 
     public static void main(String[] args) throws Exception {
-        OpencatBusinessConnectorTest.connector = new OpencatBusinessConnector(
-                OpencatBusinessConnectorTest.CLIENT, "http://localhost:8081");
-        final OpencatBusinessConnectorTest opencatBusinessConnectorTest = new OpencatBusinessConnectorTest();
+        OpencatBusinessConnectorIT.connector = new OpencatBusinessConnector(
+                OpencatBusinessConnectorIT.CLIENT, "http://localhost:8081");
+        final OpencatBusinessConnectorIT opencatBusinessConnectorTest = new OpencatBusinessConnectorIT();
 
         validateRecordTests(opencatBusinessConnectorTest);
         checkTemplateTests(opencatBusinessConnectorTest);
@@ -32,56 +32,56 @@ public class OpencatBusinessConnectorTestWireMockRecorder {
         metacompassTests(opencatBusinessConnectorTest);
     }
 
-    private static void validateRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void validateRecordTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.checkThatValidationErrorsIsProperlyReturned();
         connectorTest.sanityCheckValidateRecordJSMethod();
     }
 
-    private static void checkTemplateTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void checkTemplateTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.checkTemplateTestFBSTrue();
         connectorTest.checkTemplateTestFBSFalse();
     }
 
-    private static void checkTemplateBuildTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void checkTemplateBuildTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.checkTemplateBuild_true();
         connectorTest.checkTemplateBuild_false();
     }
 
-    private static void doubleRecordFrontendTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void doubleRecordFrontendTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.checkDoubleRecordFrontend_ok();
         connectorTest.checkDoubleRecordFrontend_fail();
     }
 
-    private static void checkDoubleRecord(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void checkDoubleRecord(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.checkDoubleRecord();
     }
 
-    private static void recategorizationNoteFieldFactoryTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void recategorizationNoteFieldFactoryTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.recategorizationNoteFieldFactory();
     }
 
-    private static void doRecategorizationThingsTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void doRecategorizationThingsTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.doRecatogorizationThings();
     }
 
-    private static void buildRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void buildRecordTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.buildRecordWithRecord();
         connectorTest.buildRecordWithoutRecord();
     }
 
-    private static void getValidateSchemasTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void getValidateSchemasTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.getValidateSchemas_dbc();
     }
 
-    private static void sortRecordTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void sortRecordTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.sortRecord();
     }
 
-    private static void preprocessTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void preprocessTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.preprocess();
     }
 
-    private static void metacompassTests(OpencatBusinessConnectorTest connectorTest) throws Exception {
+    private static void metacompassTests(OpencatBusinessConnectorIT connectorTest) throws Exception {
         connectorTest.metacompass();
         connectorTest.metacompass_ErrorCheck();
     }
