@@ -13,13 +13,11 @@ import dk.dbc.updateservice.dto.DoubleRecordFrontendStatusDTO;
 import dk.dbc.updateservice.dto.MessageEntryDTO;
 import dk.dbc.updateservice.dto.SchemaDTO;
 import dk.dbc.updateservice.dto.TypeEnumDTO;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Client;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,28 +30,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class OpencatBusinessConnectorIT {
+public class OpencatBusinessConnectorIT {
     private static WireMockServer wireMockServer;
     private static String wireMockHost;
     static OpencatBusinessConnector connector;
 
-    final static Client CLIENT = HttpClient.newClient(new ClientConfig()
-            .register(new JacksonFeature()));
+    static  Client CLIENT;
+    static {
+         CLIENT = HttpClient.newClient();
 
-    @BeforeAll
-    static void startWireMockServer() {
         WireMockConfiguration ww = options().dynamicPort();
+
         wireMockServer = new WireMockServer(options().fileSource(new SingleRootFileSource("target/test-classes")).dynamicPort().dynamicHttpsPort());
+
         wireMockServer.start();
         wireMockHost = "http://localhost:" + wireMockServer.port();
         configureFor("localhost", wireMockServer.port());
-        System.out.println("WAKKA : " + wireMockServer.getStubMappings().size());
-        System.out.println("WAKKA : " + wireMockServer.getStubMappings().toString());
-        System.out.println("WAKKA : ");
-    }
-
-    @BeforeAll
-    static void setConnector() {
         connector = new OpencatBusinessConnector(CLIENT, wireMockHost, OpencatBusinessConnector.TimingLogLevel.INFO);
     }
 
@@ -63,7 +55,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void sanityCheckValidateRecordJSMethod() throws Exception {
+    public void testSanityCheckValidateRecordJSMethod() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
@@ -117,7 +109,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void checkThatValidationErrorsIsProperlyReturned() throws Exception {
+    public void testCheckThatValidationErrorsIsProperlyReturned() throws Exception {
         String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield tag=\"001\" ind1=\"0\" ind2=\"0\">\n" +
@@ -182,35 +174,35 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void checkTemplateTestFBSTrue() throws Exception {
+    public void testCheckTemplateTestFBSTrue() throws Exception {
         boolean actual = connector.checkTemplate("netlydbog", "710100", "fbs");
 
         assertThat("checkTemplate returns true", actual, is(true));
     }
 
     @Test
-    void checkTemplateTestFBSFalse() throws Exception {
+    public void testCheckTemplateTestFBSFalse() throws Exception {
         boolean actual = connector.checkTemplate("dbc", "710100", "fbs");
 
         assertThat("checkTemplate returns false", actual, is(false));
     }
 
     @Test
-    void checkTemplateBuild_true() throws Exception {
+    public void testCheckTemplateBuild_true() throws Exception {
         final boolean actual = connector.checkTemplateBuild("allowall");
 
         assertThat("checkTemplateBuild returns true for allowall", actual, is(true));
     }
 
     @Test
-    void checkTemplateBuild_false() throws Exception {
+    public void testCheckTemplateBuild_false() throws Exception {
         final boolean actual = connector.checkTemplateBuild("julemand");
 
         assertThat("checkTemplateBuild returns false for julemand", actual, is(false));
     }
 
     @Test
-    void checkDoubleRecordFrontend_ok() throws Exception {
+    public void testCheckDoubleRecordFrontend_ok() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n" +
                 "<record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
@@ -364,7 +356,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void checkDoubleRecordFrontend_fail() throws Exception {
+    public void testCheckDoubleRecordFrontend_fail() throws Exception {
         final String marcString = "<record xmlns=\"info:lc/xmlns/marcxchange-v1\">\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
                 "        <subfield code=\"a\">52958858</subfield>\n" +
@@ -394,7 +386,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void checkDoubleRecord() throws Exception {
+    public void testCheckDoubleRecord() throws Exception {
         final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n" +
                 "<record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
@@ -547,7 +539,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void recategorizationNoteFieldFactory() throws Exception {
+    public void testRecategorizationNoteFieldFactory() throws Exception {
         final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -636,7 +628,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void buildRecordWithRecord() throws Exception {
+    public void testBuildRecordWithRecord() throws Exception {
         final String recordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -795,7 +787,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void buildRecordWithoutRecord() throws Exception {
+    public void testBuildRecordWithoutRecord() throws Exception {
         final String expectedRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<record xsi:schemaLocation=\"http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\"\n" +
                 "        xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
@@ -830,7 +822,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void doRecatogorizationThings() throws Exception {
+    public void testDoRecatogorizationThings() throws Exception {
         final String updateRecordString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -1075,7 +1067,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void getValidateSchemas_dbc() throws Exception {
+    public void testGetValidateSchemas_dbc() throws Exception {
         final List<SchemaDTO> actual = connector.getValidateSchemas("dbc", new HashSet<>());
         final List<SchemaDTO> expected = new ArrayList<>();
         expected.add(new SchemaDTO("allowall", ""));
@@ -1095,7 +1087,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void sortRecord() throws Exception {
+    public void testSortRecord() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "    <leader>00000n    2200000   4500</leader>\n" +
                 "    <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -1253,7 +1245,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void preprocess() throws Exception {
+    public void testPreprocess() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -1424,7 +1416,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void metacompass() throws Exception {
+    public void testMetacompass() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
@@ -1696,7 +1688,7 @@ class OpencatBusinessConnectorIT {
     }
 
     @Test
-    void metacompass_ErrorCheck() throws Exception {
+    public void testMetacompass_ErrorCheck() throws Exception {
         final String marcString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record xmlns=\"info:lc/xmlns/marcxchange-v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"info:lc/xmlns/marcxchange-v1 http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd\">\n" +
                 "  <leader>00000n    2200000   4500</leader>\n" +
                 "  <datafield ind1=\"0\" ind2=\"0\" tag=\"001\">\n" +
